@@ -1,0 +1,10 @@
+EXP = 'EXP'
+VAL = 'VAL'
+ENV = 'ENV'
+UNEV = 'UNEV'
+FUNC = 'FUNC'
+ARGL = 'ARGL'
+CONT = 'CONT'
+CURR = 'CURR'
+
+STACK = 'STACK'
