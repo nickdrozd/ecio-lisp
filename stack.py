@@ -1,5 +1,7 @@
 from reg import *
 
+STACK = 'STACK'
+
 def save(reg):
 	with open(STACK, 'a') as stackf:
 		with open(reg, 'r') as regf:

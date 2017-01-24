@@ -7,8 +7,6 @@ FUNC = 'FUNC'
 ARGL = 'ARGL'
 CONT = 'CONT'
 
-STACK = 'STACK'
-
 def fetch(reg):
 	with open(reg, 'r') as regf:
 		return regf.read()
