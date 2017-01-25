@@ -14,3 +14,6 @@ def fetch(reg):
 def assign(dst, val):
 	with open(src, 'r') as dstf:
 		dstf.write(val)
+
+def set_continue(label):
+	assign(CONT, label)
