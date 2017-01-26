@@ -6,6 +6,8 @@ from stack import *
 from env import *
 from instr import *
 
+###
+
 def evalNum():
 	assign(VAL, fetch(EXPR))
 	goto_continue()
@@ -18,6 +20,17 @@ def evalQuote():
 	_, text = fetch(EXPR)
 	assign(VAL, text)
 	goto_continue()
+
+###
+
+def evalLambda():
+	_, params, *body = fetch(EXPR)
+	assign(UNEV, params)
+	assign(EXPR, body)
+	assign(VAL, [fetch(ENV), fetch(UNEV), fetch(EXPR)])
+	goto_continue()
+
+###
 
 def evalDef():
 	_, var, val = fetch(EXPR)
@@ -35,6 +48,8 @@ def did_def_val():
 	restore(UNEV)
 	defineVar()
 	goto_continue()
+
+###
 
 def evalIf():
 	save(ENV)
@@ -64,6 +79,46 @@ def if_else():
 	assign(EXPR, ifElse)
 	goto_eval()
 
+###
+
+def evalFunc():
+	save(CONT)
+	func, *args = fetch(EXPR)
+	assign(EXPR, func)
+	assign(UNEV, args)
+	save(ENV)
+	save(UNEV)
+	set_continue('did_func')
+	goto_eval()
+
+def did_func():
+	restore(UNEV) # args
+	restore(ENV)
+	assign(FUNC, fetch(VAL))
+
+	save(FUNC)
+	# cont is already saved
+	goto('check_no_args')
+
+def check_no_args():
+	set_empty_arglist()
+	if not fetch(UNEV): # if no_args():
+		goto('apply')
+		return
+	# if noCompoundArgs(): ...
+	save(func)
+	goto('arg_loop')
+
+def arg_loop():
+	save(ARGL)
+	first, *rest = fetch(UNEV)
+	if not rest: # if no_remaining_args():
+		goto('last_arg')
+		return
+	save(UNEV)
+	save(ENV)
+	set_continue('acc_arg')
+	goto_eval()
 
 
 
