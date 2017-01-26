@@ -11,9 +11,9 @@ def fetch(reg):
 	with open(reg, 'r') as regf:
 		return regf.read()
 
-def assign(dst, val):
-	with open(src, 'r') as dstf:
-		dstf.write(val)
+def assign(reg, val):
+	with open(reg, 'w') as regf:
+		regf.write(val)
 
 def set_continue(label):
 	assign(CONT, label)
