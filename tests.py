@@ -11,18 +11,20 @@ class EvalTest(unittest.TestCase):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
-		self.verbose = 0
+		self.verbose = 1
 
-		self.reg1 = 'TEST_REG1'
-		self.reg2 = 'TEST_REG2'
-		self.stack = 'TEST_STACK'
+		self.reg1 = 'test_reg_1'
+		self.reg2 = 'test_reg_2'
+		self.stack = 'test_stack'
 		self.files = self.reg1, self.reg2, self.stack
 		
 	def setUp(self):
 		self.touch_files()
+		self.display()
 
 	def tearDown(self):
 		self.rm_files()
+		self.display()
 
 	# tests #
 
@@ -70,6 +72,7 @@ class EvalTest(unittest.TestCase):
 	# assertions #
 
 	def save_and_verify(self, reg):
+		self.display('saving from {}...'.format(reg))
 		depth = self.get_stack_depth()
 		save(reg, self.stack)
 		self.show_stack()
@@ -77,11 +80,12 @@ class EvalTest(unittest.TestCase):
 		self.assert_stack_top(fetch(reg))
 
 	def restore_and_verify(self, reg):
+		self.display('restoring to {}...'.format(reg))
 		depth = self.get_stack_depth()
 		top = self.get_stack_top()
 		restore(reg, self.stack)
-		self.show_stack()
 		self.assert_reg_data(reg, top)
+		self.show_stack()
 		self.assert_stack_depth(depth - 1)
 
 	def assert_stack_depth(self, expected):
@@ -129,7 +133,7 @@ class EvalTest(unittest.TestCase):
 			stack_contents = stack.read().split('\n')
 			self.display('STACK: ' + str(stack_contents))
 
-	def display(self, msg):
+	def display(self, msg=''):
 		if self.verbose:
 			print(msg)
 
