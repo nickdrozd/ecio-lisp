@@ -9,8 +9,9 @@ def save(reg):
 
 def restore(reg):
 	with open(STACK, 'r+') as stack:
-		*tail, head = stack.readlines()
+		*tail, head = stack.read().split('\n')
 		assign(reg, head)
+		tail = '\n'.join(tail)
 		stack.seek(len(tail))
 		stack.truncate()
 

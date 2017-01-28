@@ -63,12 +63,17 @@ class EvalTest(unittest.TestCase):
 		Assign distinct contents to VAL and CONT, 
 		then assign CONT to VAL.
 		'''
-		self.assign_and_verify(VAL, 'lark')
-		self.assign_and_verify(CONT, 'thrush')
+		val, cont = 'lark', 'thrush'
+
+		self.assign_and_verify_pairs(
+			(VAL, val), 
+			(CONT, cont))
 
 		assign(VAL, fetch(CONT))
-		self.assert_reg_contents(VAL, 'thrush')
-		self.assert_reg_contents(CONT, 'thrush')
+
+		self.assert_reg_contents_pairs(
+			(VAL, cont), 
+			(CONT, cont))
 
 
 	def test_save_and_restore(self):
@@ -76,8 +81,10 @@ class EvalTest(unittest.TestCase):
 		Assign to VAL and CONT, save from both, 
 		then assign back to them in reverse order.
 		'''
-		self.assign_and_verify(VAL, 'cat')
-		self.assign_and_verify(CONT, 'dog')
+		val, cont = 'cat', 'dog'
+
+		self.assign_and_verify(VAL, val)
+		self.assign_and_verify(CONT, cont)
 
 		self.assert_empty_stack()
 
@@ -86,8 +93,8 @@ class EvalTest(unittest.TestCase):
 
 		self.assert_stack_depth(2)
 
-		self.restore_and_verify(VAL)
-		self.restore_and_verify(CONT)
+		self.restore_and_verify(VAL, cont)
+		self.restore_and_verify(CONT, val)
 
 		self.assert_empty_stack()
 
@@ -125,14 +132,13 @@ class EvalTest(unittest.TestCase):
 		self.assert_stack_depth(depth + 1)
 		self.assert_stack_top(fetch(reg))
 
-	def restore_and_verify(self, reg):
+	def restore_and_verify(self, reg, expected):
 		self.display('restoring to {}...'.format(reg))
 		depth = self.get_stack_depth()
-		top = self.get_stack_top()
 		restore(reg)
-		self.assert_reg_contents(reg, top)
 		self.show_stack()
 		self.assert_stack_depth(depth - 1)
+		self.assert_reg_contents(reg, expected)
 
 	def assert_stack_depth(self, expected):
 		depth = self.get_stack_depth()
@@ -182,9 +188,11 @@ class EvalTest(unittest.TestCase):
 
 	def get_stack_top(self):
 		with open(STACK, 'r') as stack:
-			contents = stack.read()
-			self.assertNotEqual(contents, '')
-			return contents.split('\n')[-1]
+			contents = stack.readlines()
+
+		self.assertNotEqual(contents, '')
+		*tail, head = contents
+		return head
 
 	def show_stack(self):
 		with open(STACK, 'r') as stack:
