@@ -4,6 +4,10 @@ from reg import *
 from stack import *
 from instr import *
 
+from evalFuncs import *
+
+from parse import parse
+
 class EvalTest(unittest.TestCase):
 
 	# setup #
@@ -21,7 +25,30 @@ class EvalTest(unittest.TestCase):
 		# initialize()
 		self.display()
 
-	# tests #
+	# eval tests #
+
+	def test_eval_quote(self):
+		pass
+
+
+	def test_eval_var(self):
+		"lookup not implemented"
+
+
+	def test_eval_num(self):
+		expr, cont = '5', 'persimmon'
+
+		self.assign_and_verify_pairs(
+			(EXPR, expr), 
+			(CONT, cont))
+
+		evalNum()
+
+		self.assert_reg_contents_pairs(
+			(VAL, expr), 
+			(INSTR, cont))
+
+	# basic register tests #
 
 	def test_assign_and_fetch(self):
 		'''
@@ -33,15 +60,15 @@ class EvalTest(unittest.TestCase):
 
 	def test_assign_one_reg_to_another(self):
 		'''
-		Assign distinct data to VAL and CONT, 
+		Assign distinct contents to VAL and CONT, 
 		then assign CONT to VAL.
 		'''
 		self.assign_and_verify(VAL, 'lark')
 		self.assign_and_verify(CONT, 'thrush')
 
 		assign(VAL, fetch(CONT))
-		self.assert_reg_data(VAL, 'thrush')
-		self.assert_reg_data(CONT, 'thrush')
+		self.assert_reg_contents(VAL, 'thrush')
+		self.assert_reg_contents(CONT, 'thrush')
 
 
 	def test_save_and_restore(self):
@@ -75,20 +102,20 @@ class EvalTest(unittest.TestCase):
 
 	def goto_eval_and_verify(self):
 		goto_eval()
-		self.assert_reg_data(INSTR, EVAL_EXP)
+		self.assert_reg_contents(INSTR, EVAL_EXP)
 
 	def goto_continue_and_verify(self, label):
 		self.set_continue_and_verify(label)
 		goto_continue()
-		self.assert_reg_data(INSTR, label)
+		self.assert_reg_contents(INSTR, label)
 
 	def set_continue_and_verify(self, label):
 		set_continue(label)
-		self.assert_reg_data(CONT, label)
+		self.assert_reg_contents(CONT, label)
 
 	def goto_and_verify(self, label):
 		goto(label)
-		self.assert_reg_data(INSTR, label)
+		self.assert_reg_contents(INSTR, label)
 
 	def save_and_verify(self, reg):
 		self.display('saving from {}...'.format(reg))
@@ -103,7 +130,7 @@ class EvalTest(unittest.TestCase):
 		depth = self.get_stack_depth()
 		top = self.get_stack_top()
 		restore(reg)
-		self.assert_reg_data(reg, top)
+		self.assert_reg_contents(reg, top)
 		self.show_stack()
 		self.assert_stack_depth(depth - 1)
 
@@ -123,18 +150,31 @@ class EvalTest(unittest.TestCase):
 		with open(STACK, 'r') as stack:
 			self.assertEqual(stack.read(), '')
 
-	def assign_and_verify(self, reg, data):
-		self.display('assigning {} to {}...'.format(data, reg))
-		assign(reg, data)
-		self.assert_reg_data(reg, data)
+	def assign_and_verify_pairs(self, *pairs):
+		self.do_reg_val_pairs(
+			self.assign_and_verify, *pairs)
 
-	def assert_reg_data(self, reg, expected):
+	def assign_and_verify(self, reg, contents):
+		msg = 'assigning {} to {}...'
+		self.display(msg.format(contents, reg))
+		assign(reg, contents)
+		self.assert_reg_contents(reg, contents)
+
+	def assert_reg_contents_pairs(self, *pairs):
+		self.do_reg_val_pairs(
+			self.assert_reg_contents, *pairs)
+
+	def assert_reg_contents(self, reg, expected):
 		msg = '{} should contain {}; contains {}...'
 		reg_contents = fetch(reg)
 		self.display(msg.format(reg, expected, reg_contents))
 		self.assertEqual(reg_contents, expected)
 
 	# utilities #
+
+	def do_reg_val_pairs(self, func, *pairs):
+		for reg, val in pairs:
+			func(reg, val)
 
 	# general assertion 'should be'/'is' msg?
 
@@ -144,9 +184,9 @@ class EvalTest(unittest.TestCase):
 
 	def get_stack_top(self):
 		with open(STACK, 'r') as stack:
-			data = stack.read()
-			self.assertNotEqual(data, '')
-			return data.split('\n')[-1]			
+			contents = stack.read()
+			self.assertNotEqual(contents, '')
+			return contents.split('\n')[-1]
 
 	def show_stack(self):
 		with open(STACK, 'r') as stack:
