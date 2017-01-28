@@ -1,8 +1,5 @@
-from reg import *
-
 STACK = 'STACK'
 
-# stack taken as arg for testing
 
 def save(reg):
 	with open(STACK, 'r+') as stackf:
@@ -22,6 +19,5 @@ def restore(reg):
 			stackf.truncate()
 
 def clear_stack():
-	# in general we wouldn't clear the stack and the registers 
-	# the same way, but in this implementation it's possible
-	clear_register(STACK)
+	with open(STACK, 'w'):
+		pass
