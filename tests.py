@@ -1,3 +1,9 @@
+'''
+TODO:
+	* create temp files / temp dir with tempfile
+	* figure out how to test eval funcs
+'''
+
 import unittest
 import subprocess
 
@@ -13,10 +19,16 @@ class EvalTest(unittest.TestCase):
 
 		self.verbose = 1
 
-		self.reg1 = 'test_reg_1'
-		self.reg2 = 'test_reg_2'
-		self.stack = 'test_stack'
-		self.files = self.reg1, self.reg2, self.stack
+		files = ('test_expr', 'test_val', 
+				'test_env', 'test_unev', 
+				'test_func', 'test_argl', 
+				'test_cont', 'test_stack')
+
+		(self.expr, self.val, self.env,
+		self.unev, self.func, self.argl, 
+		self.cont, self.stack) = files
+
+		self.files = files
 		
 	def setUp(self):
 		self.touch_files()
@@ -30,43 +42,43 @@ class EvalTest(unittest.TestCase):
 
 	def test_assign_and_fetch(self):
 		'''
-		Assign several words to reg1.
+		Assign several words to val.
 		'''
 		for animal in 'cow', 'sheep', 'pig':
-			self.assign_and_verify(self.reg1, animal)
+			self.assign_and_verify(self.val, animal)
 
 
 	def test_assign_one_reg_to_another(self):
 		'''
-		Assign distinct data to reg1 and reg2, 
-		then assign reg2 to reg1
+		Assign distinct data to val and cont, 
+		then assign cont to val
 		'''
-		reg1, reg2 = self.reg1, self.reg2
+		val, cont = self.val, self.cont
 
 
-		self.assign_and_verify(reg1, 'lark')
-		self.assign_and_verify(reg2, 'thrush')
+		self.assign_and_verify(val, 'lark')
+		self.assign_and_verify(cont, 'thrush')
 
-		assign(self.reg1, fetch(self.reg2))
-		self.assert_reg_data(reg1, 'thrush')
-		self.assert_reg_data(reg2, 'thrush')
+		assign(self.val, fetch(self.cont))
+		self.assert_reg_data(val, 'thrush')
+		self.assert_reg_data(cont, 'thrush')
 
 
 	def test_save_and_restore(self):
-		reg1, reg2 = self.reg1, self.reg2
+		val, cont = self.val, self.cont
 
-		self.assign_and_verify(reg1, 'cat')
-		self.assign_and_verify(reg2, 'dog')
+		self.assign_and_verify(val, 'cat')
+		self.assign_and_verify(cont, 'dog')
 
 		self.assert_empty_stack()
 
-		self.save_and_verify(reg1)
-		self.save_and_verify(reg2)
+		self.save_and_verify(val)
+		self.save_and_verify(cont)
 
 		self.assert_stack_depth(2)
 
-		self.restore_and_verify(reg1)
-		self.restore_and_verify(reg2)
+		self.restore_and_verify(val)
+		self.restore_and_verify(cont)
 
 
 	# assertions #
@@ -100,17 +112,6 @@ class EvalTest(unittest.TestCase):
 		self.display(msg.format(top, data))
 		self.assertEqual(top, data)
 
-	def get_stack_depth(self):
-		with open(self.stack, 'r') as stack:
-			return len(stack.readlines())
-
-	def get_stack_top(self):
-		with open(self.stack, 'r') as stack:
-			data = stack.read()
-			self.assertNotEqual(data, '')
-			# last item in read().split('\n') is empty string?
-			return data.split('\n')[-1]			
-
 	def assert_empty_stack(self):
 		with open(self.stack, 'r') as stack:
 			self.assertEqual(stack.read(), '')
@@ -127,6 +128,16 @@ class EvalTest(unittest.TestCase):
 		self.assertEqual(reg_contents, expected)
 
 	# utilities #
+
+	def get_stack_depth(self):
+		with open(self.stack, 'r') as stack:
+			return len(stack.readlines())
+
+	def get_stack_top(self):
+		with open(self.stack, 'r') as stack:
+			data = stack.read()
+			self.assertNotEqual(data, '')
+			return data.split('\n')[-1]			
 
 	def show_stack(self):
 		with open(self.stack, 'r') as stack:
