@@ -7,6 +7,8 @@ FUNC = 'FUNC'
 ARGL = 'ARGL'
 CONT = 'CONT'
 
+REGISTERS = EXPR, VAL, ENV, UNEV, FUNC, ARGL, CONT
+
 def fetch(reg):
 	with open(reg, 'r') as regf:
 		return regf.read()
@@ -17,3 +19,11 @@ def assign(reg, val):
 
 def set_continue(label):
 	assign(CONT, label)
+
+def clear_register(reg):
+	with open(reg, 'w'):
+		pass
+
+def clear_registers():
+	for reg in REGISTERS:
+		clear_register(reg)
