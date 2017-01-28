@@ -1,2 +1,14 @@
 __pycache__
 *.pyc
+*.txt
+
+# registers
+ARGL
+CONT
+ENV
+EXPR
+FUNC
+INSTR
+STACK
+UNEV
+VAL
