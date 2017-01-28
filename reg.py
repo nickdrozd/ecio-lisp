@@ -1,4 +1,3 @@
-# register shorthand
 EXPR = 'EXPR'
 VAL = 'VAL'
 ENV = 'ENV'
@@ -8,6 +7,7 @@ ARGL = 'ARGL'
 CONT = 'CONT'
 
 REGISTERS = EXPR, VAL, ENV, UNEV, FUNC, ARGL, CONT
+
 
 def fetch(reg):
 	with open(reg, 'r') as regf:
