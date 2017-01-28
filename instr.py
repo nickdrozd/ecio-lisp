@@ -2,6 +2,7 @@ from reg import *
 
 INSTR = 'INSTR'
 
+
 def goto(label):
 	assign(INSTR, label)
 
@@ -9,11 +10,11 @@ def goto_continue():
 	goto(fetch(CONT))
 
 def goto_eval():
-	goto('EVAL_EXP')
+	goto(EVAL_EXP)
 
 def execute():
 	labels = {
-		'EVAL_EXP': evalExp
+		EVAL_EXP: evalExp
 	}
 
 	label = fetch(INSTR)
@@ -22,3 +23,7 @@ def execute():
 		label()
 	except:
 		raise Exception('Unknown label: {}'.format(label))
+
+# labels (separate file?)
+
+EVAL_EXP = 'EVAL_EXP'
