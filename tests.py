@@ -6,7 +6,7 @@ from instr import *
 
 from evalFuncs import *
 
-from parse import parse
+from init import initialize
 
 class EvalTest(unittest.TestCase):
 
@@ -176,8 +176,6 @@ class EvalTest(unittest.TestCase):
 		for reg, val in pairs:
 			func(reg, val)
 
-	# general assertion 'should be'/'is' msg?
-
 	def get_stack_depth(self):
 		with open(STACK, 'r') as stack:
 			return len(stack.readlines())
@@ -192,6 +190,8 @@ class EvalTest(unittest.TestCase):
 		with open(STACK, 'r') as stack:
 			stack_contents = stack.read().split('\n')
 			self.display('STACK: ' + str(stack_contents))
+
+	# general assertion 'should be'/'is' msg?
 
 	def display(self, msg=''):
 		if self.verbose:
