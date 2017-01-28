@@ -18,7 +18,7 @@ def defineVar():
 	frame[var] = val
 	# write frame to ENV
 
-def setVar()
+def setVar():
 	frame, lower = fetch(ENV)
 	var, val = fetch(UNEV), fetch(VAL)
 

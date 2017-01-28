@@ -2,7 +2,6 @@ from reg import *
 
 INSTR = 'INSTR'
 
-
 def goto(label):
 	assign(INSTR, label)
 
