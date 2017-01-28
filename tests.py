@@ -50,19 +50,19 @@ class EvalTest(unittest.TestCase):
 
 	# basic register tests #
 
-	def test_assign_and_fetch(self):
+	def test_reg(self):
 		'''
-		Assign several words to VAL.
-		'''
-		for animal in 'cow', 'sheep', 'pig':
-			self.assign_and_verify(VAL, animal)
+		1) Assign several words to EXPR.
 
-
-	def test_assign_one_reg_to_another(self):
-		'''
-		Assign distinct contents to VAL and CONT, 
+		2) Assign distinct contents to VAL and CONT, 
 		then assign CONT to VAL.
 		'''
+
+		for animal in 'cow', 'pig', 'sheep':
+			self.assign_and_verify(EXPR, animal)
+
+		self.display()
+
 		val, cont = 'lark', 'thrush'
 
 		self.assign_and_verify_pairs(
@@ -76,25 +76,28 @@ class EvalTest(unittest.TestCase):
 			(CONT, cont))
 
 
-	def test_save_and_restore(self):
+	def test_stack(self):
 		'''
 		Assign to VAL and CONT, save from both, 
 		then assign back to them in reverse order.
 		'''
 		val, cont = 'cat', 'dog'
 
-		self.assign_and_verify(VAL, val)
-		self.assign_and_verify(CONT, cont)
+		self.assign_and_verify_pairs(
+			(VAL, val), 
+			(CONT, cont))
 
 		self.assert_empty_stack()
 
-		self.save_and_verify(VAL)
-		self.save_and_verify(CONT)
+		self.save_and_verify(
+			VAL, 
+			CONT)
 
 		self.assert_stack_depth(2)
 
-		self.restore_and_verify(VAL, cont)
-		self.restore_and_verify(CONT, val)
+		self.restore_and_verify_pairs(
+			(VAL, cont), 
+			(CONT, val))
 
 		self.assert_empty_stack()
 
@@ -124,13 +127,18 @@ class EvalTest(unittest.TestCase):
 		goto(label)
 		self.assert_reg_contents(INSTR, label)
 
-	def save_and_verify(self, reg):
-		self.display('saving from {}...'.format(reg))
-		depth = self.get_stack_depth()
-		save(reg)
-		self.show_stack()
-		self.assert_stack_depth(depth + 1)
-		self.assert_stack_top(fetch(reg))
+	def save_and_verify(self, *regs):
+		for reg in regs:
+			self.display('saving from {}...'.format(reg))
+			depth = self.get_stack_depth()
+			save(reg)
+			self.show_stack()
+			self.assert_stack_depth(depth + 1)
+			self.assert_stack_top(fetch(reg))
+
+	def restore_and_verify_pairs(self, *pairs):
+		for reg, expected in pairs:
+			self.restore_and_verify(reg, expected)
 
 	def restore_and_verify(self, reg, expected):
 		self.display('restoring to {}...'.format(reg))
@@ -157,8 +165,8 @@ class EvalTest(unittest.TestCase):
 			self.assertEqual(stack.read(), '')
 
 	def assign_and_verify_pairs(self, *pairs):
-		self.do_reg_val_pairs(
-			self.assign_and_verify, *pairs)
+		for reg, contents in pairs:
+			self.assign_and_verify(reg, contents)
 
 	def assign_and_verify(self, reg, contents):
 		msg = 'assigning {} to {}...'
@@ -167,8 +175,8 @@ class EvalTest(unittest.TestCase):
 		self.assert_reg_contents(reg, contents)
 
 	def assert_reg_contents_pairs(self, *pairs):
-		self.do_reg_val_pairs(
-			self.assert_reg_contents, *pairs)
+		for reg, expected in pairs:
+			self.assert_reg_contents(reg, expected)
 
 	def assert_reg_contents(self, reg, expected):
 		msg = '{} should contain {}; contains {}...'
@@ -177,10 +185,6 @@ class EvalTest(unittest.TestCase):
 		self.assertEqual(reg_contents, expected)
 
 	# utilities #
-
-	def do_reg_val_pairs(self, func, *pairs):
-		for reg, val in pairs:
-			func(reg, val)
 
 	def get_stack_depth(self):
 		with open(STACK, 'r') as stack:
