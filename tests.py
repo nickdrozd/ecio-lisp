@@ -1,14 +1,8 @@
-'''
-TODO:
-	* create temp files / temp dir with tempfile
-	* figure out how to test eval funcs
-'''
-
 import unittest
-import subprocess
 
 from reg import *
 from stack import *
+from instr import *
 
 class EvalTest(unittest.TestCase):
 
@@ -19,11 +13,12 @@ class EvalTest(unittest.TestCase):
 		self.verbose = 1
 		
 	def setUp(self):
+		# ensure files exist?
 		initialize()
 		self.display()
 
 	def tearDown(self):
-		initialize()
+		# initialize()
 		self.display()
 
 	# tests #
@@ -39,7 +34,7 @@ class EvalTest(unittest.TestCase):
 	def test_assign_one_reg_to_another(self):
 		'''
 		Assign distinct data to VAL and CONT, 
-		then assign CONT to VAL
+		then assign CONT to VAL.
 		'''
 		self.assign_and_verify(VAL, 'lark')
 		self.assign_and_verify(CONT, 'thrush')
@@ -50,7 +45,10 @@ class EvalTest(unittest.TestCase):
 
 
 	def test_save_and_restore(self):
-
+		'''
+		Assign to VAL and CONT, save from both, 
+		then assign back to them in reverse order.
+		'''
 		self.assign_and_verify(VAL, 'cat')
 		self.assign_and_verify(CONT, 'dog')
 
@@ -64,8 +62,33 @@ class EvalTest(unittest.TestCase):
 		self.restore_and_verify(VAL)
 		self.restore_and_verify(CONT)
 
+		self.assert_empty_stack()
+
+
+	def test_goto(self):
+		self.goto_and_verify('quince')
+		self.goto_continue_and_verify('fig')
+		self.goto_eval_and_verify()
+
 
 	# assertions #
+
+	def goto_eval_and_verify(self):
+		goto_eval()
+		self.assert_reg_data(INSTR, EVAL_EXP)
+
+	def goto_continue_and_verify(self, label):
+		self.set_continue_and_verify(label)
+		goto_continue()
+		self.assert_reg_data(INSTR, label)
+
+	def set_continue_and_verify(self, label):
+		set_continue(label)
+		self.assert_reg_data(CONT, label)
+
+	def goto_and_verify(self, label):
+		goto(label)
+		self.assert_reg_data(INSTR, label)
 
 	def save_and_verify(self, reg):
 		self.display('saving from {}...'.format(reg))
@@ -90,11 +113,11 @@ class EvalTest(unittest.TestCase):
 		self.display(msg.format(expected, depth))
 		self.assertEqual(expected, depth)
 
-	def assert_stack_top(self, data):
+	def assert_stack_top(self, expected):
 		top = self.get_stack_top()
-		msg = 'top of stack is {}, should be {}...'
-		self.display(msg.format(top, data))
-		self.assertEqual(top, data)
+		msg = 'top of stack should be {}; is {}...'
+		self.display(msg.format(expected, top))
+		self.assertEqual(top, expected)
 
 	def assert_empty_stack(self):
 		with open(STACK, 'r') as stack:
@@ -106,12 +129,14 @@ class EvalTest(unittest.TestCase):
 		self.assert_reg_data(reg, data)
 
 	def assert_reg_data(self, reg, expected):
-		msg = '{} should contain {}, contains {}...'
+		msg = '{} should contain {}; contains {}...'
 		reg_contents = fetch(reg)
 		self.display(msg.format(reg, expected, reg_contents))
 		self.assertEqual(reg_contents, expected)
 
 	# utilities #
+
+	# general assertion 'should be'/'is' msg?
 
 	def get_stack_depth(self):
 		with open(STACK, 'r') as stack:
@@ -131,19 +156,6 @@ class EvalTest(unittest.TestCase):
 	def display(self, msg=''):
 		if self.verbose:
 			print(msg)
-
-
-
-	def touch_files(self):
-		self.run_cmd_on_files('touch')
-
-	def rm_files(self):
-		self.run_cmd_on_files('rm')
-
-	def run_cmd_on_files(self, cmd):
-		for file in self.files:
-			subprocess.call(
-				'{} {}'.format(cmd, file).split(' '))
 
 
 def initialize():
