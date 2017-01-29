@@ -1,3 +1,5 @@
+import json
+
 EXPR = 'EXPR'
 VAL = 'VAL'
 ENV = 'ENV'
@@ -10,12 +12,11 @@ REGISTERS = EXPR, VAL, ENV, UNEV, FUNC, ARGL, CONT
 
 def fetch(reg):
 	with open(reg, 'r') as regf:
-		return regf.read()
+		return json.loads(regf.read())
 
 def assign(reg, val):
 	with open(reg, 'w') as regf:
-		# str(val)? json.dumps(val)?
-		regf.write(val)
+		regf.write(json.dumps(val))
 
 def set_continue(label):
 	assign(CONT, label)
@@ -27,3 +28,6 @@ def clear_register(reg):
 def clear_registers():
 	for reg in REGISTERS:
 		clear_register(reg)
+
+def show_register(reg):
+	print(fetch(reg))

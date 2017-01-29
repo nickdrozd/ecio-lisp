@@ -1,4 +1,5 @@
 import unittest
+import json
 
 from reg import *
 from stack import *
@@ -7,6 +8,8 @@ from instr import *
 from evalFuncs import *
 
 from init import initialize
+from parse import parse
+
 
 class EvalTest(unittest.TestCase):
 
@@ -28,7 +31,11 @@ class EvalTest(unittest.TestCase):
 	# eval tests #
 
 	def test_eval_quote(self):
-		pass
+		code = parse('(quote (cow pig sheep))')
+		# self.assign_and_verify(EXPR, code)
+
+
+
 
 
 	def test_eval_var(self):
@@ -58,7 +65,7 @@ class EvalTest(unittest.TestCase):
 		then assign CONT to VAL.
 		'''
 
-		for animal in 'cow', 'pig', 'sheep':
+		for animal in 'wren', 'jay', 'finch':
 			self.assign_and_verify(EXPR, animal)
 
 		self.display()
@@ -75,13 +82,17 @@ class EvalTest(unittest.TestCase):
 			(VAL, cont), 
 			(CONT, cont))
 
+		code = '(warbler bulbul titmouse)'
+
+		self.assign_and_verify(FUNC, parse(code))
+
 
 	def test_stack(self):
 		'''
 		Assign to VAL and CONT, save from both, 
 		then assign back to them in reverse order.
 		'''
-		val, cont = 'cat', 'dog'
+		val, cont = 'schipperke', 'pomeranian'
 
 		self.assign_and_verify_pairs(
 			(VAL, val), 
@@ -89,9 +100,9 @@ class EvalTest(unittest.TestCase):
 
 		self.assert_empty_stack()
 
-		self.save_and_verify(
-			VAL, 
-			CONT)
+		self.save_and_verify_pairs(
+			(VAL, val),  
+			(CONT, cont))
 
 		self.assert_stack_depth(2)
 
@@ -100,6 +111,16 @@ class EvalTest(unittest.TestCase):
 			(CONT, val))
 
 		self.assert_empty_stack()
+
+		# save and restore lists
+
+		self.display()
+
+		code = parse('(yorkie scottie jack russell)')
+
+		self.assign_and_verify(ARGL, code)
+		self.save_and_verify(ARGL, code)
+		self.restore_and_verify(UNEV, code)
 
 
 	def test_goto(self):
@@ -127,14 +148,18 @@ class EvalTest(unittest.TestCase):
 		goto(label)
 		self.assert_reg_contents(INSTR, label)
 
-	def save_and_verify(self, *regs):
-		for reg in regs:
-			self.display('saving from {}...'.format(reg))
-			depth = self.get_stack_depth()
-			save(reg)
-			self.show_stack()
-			self.assert_stack_depth(depth + 1)
-			self.assert_stack_top(fetch(reg))
+	def save_and_verify_pairs(self, *pairs):
+		for reg, expected in pairs:
+			self.save_and_verify(reg, expected)
+
+	def save_and_verify(self, reg, expected):
+		self.display('saving from {}...'.format(reg))
+		depth = self.get_stack_depth()
+		save(reg)
+		self.show_stack()
+		self.assert_stack_depth(depth + 1)
+		self.assert_stack_top(expected)
+		self.assert_reg_contents(reg, expected)
 
 	def restore_and_verify_pairs(self, *pairs):
 		for reg, expected in pairs:
@@ -196,7 +221,7 @@ class EvalTest(unittest.TestCase):
 
 		self.assertNotEqual(contents, '')
 		*tail, head = contents
-		return head
+		return json.loads(head)
 
 	def show_stack(self):
 		with open(STACK, 'r') as stack:
@@ -208,11 +233,6 @@ class EvalTest(unittest.TestCase):
 	def display(self, msg=''):
 		if self.verbose:
 			print(msg)
-
-
-def initialize():
-	clear_registers()
-	clear_stack()
 
 
 if __name__ == '__main__':
