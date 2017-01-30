@@ -31,6 +31,27 @@ class EvalTest(unittest.TestCase):
 
 	# eval tests #
 
+	def test_eval_lambda(self):
+		code = parse('(λ (a b c) (f a b c))')
+		cont = 'done'
+		env = empty_env()
+
+		self.set_up_registers({
+			EXPR : code,
+			CONT : cont,
+			ENV : env,
+		})
+
+		evalLambda()
+
+		_, params, *body = code
+
+		self.verify_outcome({
+			VAL : [env, params, body],
+			INSTR : cont
+		})
+
+
 	def test_eval_quote(self):
 		code = parse('(quote (cow pig sheep))')
 		_, text = code
