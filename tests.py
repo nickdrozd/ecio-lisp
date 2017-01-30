@@ -36,20 +36,22 @@ class EvalTest(unittest.TestCase):
 		cont = 'done'
 		env = empty_env()
 
-		self.set_up_registers({
+		before = {
 			EXPR : code,
 			CONT : cont,
 			ENV : env,
-		})
+		}
 
-		evalLambda()
+		func = evalLambda
 
 		_, params, *body = code
 
-		self.verify_outcome({
+		after = {
 			VAL : [env, params, body],
 			INSTR : cont
-		})
+		}
+
+		self.assert_before_func_after(before, func, after)
 
 
 	def test_eval_quote(self):
@@ -57,17 +59,19 @@ class EvalTest(unittest.TestCase):
 		_, text = code
 		cont = 'goat'
 
-		self.set_up_registers({
+		before = {
 			EXPR : code,
 			CONT : cont
-		})
+		}
 
-		evalQuote()
+		func = evalQuote
 
-		self.verify_outcome({
+		after = {
 			VAL : text,
 			INSTR : cont
-		})
+		}
+
+		self.assert_before_func_after(before, func, after)
 
 
 	def test_eval_var(self):
@@ -81,21 +85,8 @@ class EvalTest(unittest.TestCase):
 		cont = 'persian'
 
 		def test_lookup(var, val):
-			self.set_up_registers({
-				EXPR : var,
-				ENV : env,
-				CONT : cont
-			})
-
 			self.display('looking up {}...'.format(var))
-			
-			evalVar()
-
-			self.verify_outcome({
-				VAL : val,
-				ENV : env,
-				INSTR : cont
-			})
+			self._test_eval_var(var, val, env, cont)
 
 		# check topmost frame
 		test_lookup('ragdoll', 4)
@@ -106,21 +97,41 @@ class EvalTest(unittest.TestCase):
 		# unbound
 		test_lookup('siamese', UNBOUND)
 
+	def _test_eval_var(self, var, val, env, cont):
+		before = {
+			EXPR : var,
+			ENV : env,
+			CONT : cont
+		}
+
+		func = evalVar
+
+		after = {
+			VAL : val,
+			ENV : env,
+			INSTR : cont
+		}
+
+		self.assert_before_func_after(before, func, after)
+
+
 
 	def test_eval_num(self):
 		num, cont = 5, 'persimmon'
 
-		self.set_up_registers({
+		before = {
 			EXPR : num,
 			CONT : cont
-		})
+		}
 
-		evalNum()
+		func = evalNum
 
-		self.verify_outcome({
+		after = {
 			VAL : num,
 			INSTR : cont
-		})
+		}
+
+		self.assert_before_func_after(before, func, after)
 
 	# basic register tests #
 
@@ -198,6 +209,14 @@ class EvalTest(unittest.TestCase):
 		self.goto_eval_and_verify()
 
 	# assertions #
+
+	def assert_before_func_after(self, before, func, after):
+		'''
+		before and after are dicts, func a function
+		'''
+		self.set_up_registers(before)
+		func()
+		self.verify_outcome(after)
 
 	def set_up_registers(self, setup):
 		for reg in setup:
