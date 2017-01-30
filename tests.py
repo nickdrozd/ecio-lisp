@@ -4,6 +4,7 @@ import json
 from reg import *
 from stack import *
 from instr import *
+from env import *
 
 from evalFuncs import *
 
@@ -49,11 +50,44 @@ class EvalTest(unittest.TestCase):
 
 
 	def test_eval_var(self):
-		"lookup not implemented"
+		env = [
+			{'ragdoll': 4}, [
+				{'sphynx': 5},
+				[]
+			]
+		]
+
+		cont = 'persian'
+
+		def test_lookup(var, val):
+			self.set_up_registers({
+				EXPR : var,
+				ENV : env,
+				CONT : cont
+			})
+
+			self.display('looking up {}...'.format(var))
+			
+			evalVar()
+
+			self.verify_outcome({
+				VAL : val,
+				ENV : env,
+				INSTR : cont
+			})
+
+		# check topmost frame
+		test_lookup('ragdoll', 4)
+
+		# check inner frame
+		test_lookup('sphynx', 5)
+
+		# unbound
+		test_lookup('siamese', UNBOUND)
 
 
 	def test_eval_num(self):
-		num, cont = '5', 'persimmon'
+		num, cont = 5, 'persimmon'
 
 		self.set_up_registers({
 			EXPR : num,

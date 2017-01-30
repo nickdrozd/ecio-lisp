@@ -1,4 +1,14 @@
-# ENV consists of pair [ {<env vals>}, [<lower env / empty>] ]
+from reg import *
+
+'''
+ENV consists of pair
+[
+	{<frame vals>},
+	[<lower env / empty>]
+]
+'''
+
+UNBOUND = 'UNBOUND'
 
 def lookup(reg):
 	frame, lower = fetch(ENV)
@@ -10,7 +20,7 @@ def lookup(reg):
 		elif lower:
 			frame, lower = lower
 		else:
-			return 'UNBOUND'
+			return UNBOUND
 
 def defineVar():
 	frame, lower = fetch(ENV)
@@ -31,3 +41,6 @@ def setVar():
 		else:
 			pass
 			# raise exception? return dummy val
+
+def empty_env():
+	return [ {}, [] ]
