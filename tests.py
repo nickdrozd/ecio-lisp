@@ -32,10 +32,20 @@ class EvalTest(unittest.TestCase):
 
 	def test_eval_quote(self):
 		code = parse('(quote (cow pig sheep))')
-		# self.assign_and_verify(EXPR, code)
+		_, text = code
+		cont = 'goat'
 
+		self.set_up_registers({
+			EXPR : code,
+			CONT : cont
+		})
 
+		evalQuote()
 
+		self.verify_outcome({
+			VAL : text,
+			INSTR : cont
+		})
 
 
 	def test_eval_var(self):
@@ -43,17 +53,19 @@ class EvalTest(unittest.TestCase):
 
 
 	def test_eval_num(self):
-		expr, cont = '5', 'persimmon'
+		num, cont = '5', 'persimmon'
 
-		self.assign_and_verify_pairs(
-			(EXPR, expr), 
-			(CONT, cont))
+		self.set_up_registers({
+			EXPR : num,
+			CONT : cont
+		})
 
 		evalNum()
 
-		self.assert_reg_contents_pairs(
-			(VAL, expr), 
-			(INSTR, cont))
+		self.verify_outcome({
+			VAL : num,
+			INSTR : cont
+		})
 
 	# basic register tests #
 
@@ -64,7 +76,6 @@ class EvalTest(unittest.TestCase):
 		2) Assign distinct contents to VAL and CONT, 
 		then assign CONT to VAL.
 		'''
-
 		for animal in 'wren', 'jay', 'finch':
 			self.assign_and_verify(EXPR, animal)
 
@@ -72,19 +83,21 @@ class EvalTest(unittest.TestCase):
 
 		val, cont = 'lark', 'thrush'
 
-		self.assign_and_verify_pairs(
-			(VAL, val), 
-			(CONT, cont))
+		self.set_up_registers({
+			VAL : val,
+			CONT : cont
+		})
 
 		assign(VAL, fetch(CONT))
 
-		self.assert_reg_contents_pairs(
-			(VAL, cont), 
-			(CONT, cont))
+		self.verify_outcome({
+			VAL : cont,
+			CONT : cont
+		})
 
-		code = '(warbler bulbul titmouse)'
+		code = parse('(warbler bulbul titmouse)')
 
-		self.assign_and_verify(FUNC, parse(code))
+		self.assign_and_verify(FUNC, code)
 
 
 	def test_stack(self):
@@ -94,20 +107,21 @@ class EvalTest(unittest.TestCase):
 		'''
 		val, cont = 'schipperke', 'pomeranian'
 
-		self.assign_and_verify_pairs(
-			(VAL, val), 
-			(CONT, cont))
+		self.set_up_registers({
+			VAL : val,
+			CONT : cont
+		})
 
 		self.assert_empty_stack()
 
 		self.save_and_verify_pairs(
-			(VAL, val),  
+			(VAL, val),
 			(CONT, cont))
 
 		self.assert_stack_depth(2)
 
 		self.restore_and_verify_pairs(
-			(VAL, cont), 
+			(VAL, cont),
 			(CONT, val))
 
 		self.assert_empty_stack()
@@ -128,8 +142,15 @@ class EvalTest(unittest.TestCase):
 		self.goto_continue_and_verify('fig')
 		self.goto_eval_and_verify()
 
-
 	# assertions #
+
+	def set_up_registers(self, setup):
+		for reg in setup:
+			self.assign_and_verify(reg, setup[reg])
+
+	def verify_outcome(self, expected):
+		for reg in expected:
+			self.assert_reg_contents(reg, expected[reg])
 
 	def goto_eval_and_verify(self):
 		goto_eval()
@@ -175,14 +196,14 @@ class EvalTest(unittest.TestCase):
 
 	def assert_stack_depth(self, expected):
 		depth = self.get_stack_depth()
-		msg = 'stack depth should be {}; is {}...'
-		self.display(msg.format(expected, depth))
+		self.display_expected_actual(
+			'STACK DEPTH', expected, depth)
 		self.assertEqual(expected, depth)
 
 	def assert_stack_top(self, expected):
 		top = self.get_stack_top()
-		msg = 'top of stack should be {}; is {}...'
-		self.display(msg.format(expected, top))
+		self.display_expected_actual(
+			'STACK TOP', expected, top)
 		self.assertEqual(top, expected)
 
 	def assert_empty_stack(self):
@@ -204,10 +225,9 @@ class EvalTest(unittest.TestCase):
 			self.assert_reg_contents(reg, expected)
 
 	def assert_reg_contents(self, reg, expected):
-		msg = '{} should contain {}; contains {}...'
-		reg_contents = fetch(reg)
-		self.display(msg.format(reg, expected, reg_contents))
-		self.assertEqual(reg_contents, expected)
+		contents = fetch(reg)
+		self.display_expected_actual(reg, expected, contents)
+		self.assertEqual(contents, expected)
 
 	# utilities #
 
@@ -228,7 +248,9 @@ class EvalTest(unittest.TestCase):
 			stack_contents = stack.read().split('\n')
 			self.display('STACK: ' + str(stack_contents))
 
-	# general assertion 'should be'/'is' msg?
+	def display_expected_actual(self, reg, expected, actual):
+		msg = '{} -- expected: {} -- actual: {}'
+		self.display(msg.format(reg, expected, actual))
 
 	def display(self, msg=''):
 		if self.verbose:
