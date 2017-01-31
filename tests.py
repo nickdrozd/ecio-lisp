@@ -29,52 +29,9 @@ class EvalTest(unittest.TestCase):
 		# initialize()
 		self.display()
 
-	# eval tests #
+	# environment operations #
 
-	def test_eval_lambda(self):
-		code = parse('(λ (a b c) (f a b c))')
-		cont = 'done'
-		env = empty_env()
-
-		before = {
-			EXPR : code,
-			CONT : cont,
-			ENV : env,
-		}
-
-		func = evalLambda
-
-		_, params, *body = code
-
-		after = {
-			VAL : [env, params, body],
-			INSTR : cont
-		}
-
-		self.assert_before_func_after(before, func, after)
-
-
-	def test_eval_quote(self):
-		code = parse('(quote (cow pig sheep))')
-		_, text = code
-		cont = 'goat'
-
-		before = {
-			EXPR : code,
-			CONT : cont
-		}
-
-		func = evalQuote
-
-		after = {
-			VAL : text,
-			INSTR : cont
-		}
-
-		self.assert_before_func_after(before, func, after)
-
-
-	def test_eval_var(self):
+	def test_lookup(self):
 		env = [
 			{'ragdoll': 4}, [
 				{'sphynx': 5},
@@ -82,53 +39,45 @@ class EvalTest(unittest.TestCase):
 			]
 		]
 
-		cont = 'persian'
+		pairs = (
+			('ragdoll', 4),
+			('sphynx', 5),
+			('siamese', UNBOUND))
 
-		def test_lookup(var, val):
-			self.display('looking up {}...'.format(var))
-			self._test_eval_var(var, val, env, cont)
+		self.assign_and_verify(ENV, env)
 
-		# check topmost frame
-		test_lookup('ragdoll', 4)
+		for var, val in pairs:
+			self.assign_and_verify(VAL, var)
+			self.assertEqual(val, lookup(VAL))
 
-		# check inner frame
-		test_lookup('sphynx', 5)
 
-		# unbound
-		test_lookup('siamese', UNBOUND)
+	def test_define_var(self):
+		initial_env = [
+			{'trout': 4}, [
+				{'cod': 5},
+				[]
+			]
+		]
 
-	def _test_eval_var(self, var, val, env, cont):
+		var, val = 'halibut', 6
+
+		expected_env = [
+			{'trout': 4, 'halibut': 6}, [
+				{'cod': 5},
+				[]
+			]
+		]
+
 		before = {
-			EXPR : var,
-			ENV : env,
-			CONT : cont
-		}
-
-		func = evalVar
-
-		after = {
+			ENV : initial_env,
 			VAL : val,
-			ENV : env,
-			INSTR : cont
+			UNEV : var
 		}
 
-		self.assert_before_func_after(before, func, after)
-
-
-
-	def test_eval_num(self):
-		num, cont = 5, 'persimmon'
-
-		before = {
-			EXPR : num,
-			CONT : cont
-		}
-
-		func = evalNum
+		func = defineVar
 
 		after = {
-			VAL : num,
-			INSTR : cont
+			ENV : expected_env
 		}
 
 		self.assert_before_func_after(before, func, after)
