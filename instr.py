@@ -1,6 +1,7 @@
 from reg import *
 
 INSTR = 'INSTR'
+DONE = 'done'
 
 def goto(label):
 	assign(INSTR, label)
@@ -10,6 +11,9 @@ def goto_continue():
 
 def goto_eval():
 	goto(EVAL_EXP)
+
+def initialize_cont():
+	assign(CONT, DONE)
 
 def execute():
 	labels = {

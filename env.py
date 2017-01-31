@@ -43,5 +43,8 @@ def setVar():
 			break
 			# raise exception? return dummy val
 
-def empty_env():
+def initial_env():
 	return [ {}, [] ]
+
+def initialize_env():
+	assign(ENV, initial_env())
