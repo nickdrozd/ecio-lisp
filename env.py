@@ -26,7 +26,7 @@ def defineVar():
 	frame, lower = fetch(ENV)
 	var, val = fetch(UNEV), fetch(VAL)
 	frame[var] = val
-	# write frame to ENV
+	assign(ENV, [frame, lower])
 
 def setVar():
 	frame, lower = fetch(ENV)
@@ -35,11 +35,12 @@ def setVar():
 	while frame:
 		if var in frame:
 			frame[var] = val
-			# write frame to ENV
+			assign(ENV, [frame, lower])
+			break
 		elif lower:
 			frame, lower = lower
 		else:
-			pass
+			break
 			# raise exception? return dummy val
 
 def empty_env():
