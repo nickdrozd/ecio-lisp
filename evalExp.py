@@ -1,30 +1,30 @@
 from keywords import *
 from reg import *
-from parse import parse
+from evalFuncs import *
 
 def evalExp():
-	expr = parse(fetch(EXPR)) # make dedicated fetch_expr()?
+	expr = fetch(EXPR)
 	# expr = transformMacros(expr)
 	evalFunc = getEvalFunc(expr)
-	# evalFunc()
-	# reassign next step
+	evalFunc()
+
 
 def getEvalFunc(expr):
 	if isVar(expr):
-		return compVar
+		return evalVar
 
 	if isNum(expr):
-		return compNum
+		return evalNum
 
 	# else
 	tag, *_ = expr
 
 	keyword_groups = {
-		define_keys : evalDef, 
-		ass_keys : evalAss, 
+		# define_keys : evalDef, 
+		# ass_keys : evalAss, 
 		lambda_keys : evalLambda, 
 		if_keys : evalIf, 
-		begin_keys : evalBegin, 
+		# begin_keys : evalBegin, 
 		quote_keys : evalQuote
 	}
 
@@ -34,6 +34,7 @@ def getEvalFunc(expr):
 
 	# default
 	return evalApp
+
 
 def isNum(exp):
 	try:
