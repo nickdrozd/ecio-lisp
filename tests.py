@@ -6,9 +6,6 @@ from stack import *
 from instr import *
 from env import *
 
-from evalFuncs import *
-
-from init import initialize
 from parse import parse
 
 
@@ -22,7 +19,8 @@ class EvalTest(unittest.TestCase):
 		
 	def setUp(self):
 		# ensure files exist?
-		initialize()
+		# clear_registers()
+		# clear_stack()
 		self.display()
 
 	def tearDown(self):
@@ -156,6 +154,15 @@ class EvalTest(unittest.TestCase):
 		self.goto_and_verify('quince')
 		self.goto_continue_and_verify('fig')
 		self.goto_eval_and_verify()
+
+
+	def test_initialize(self):
+		clear_registers()
+		clear_stack()
+
+		for reg in REGISTERS + (STACK,):
+			with open(reg, 'r') as regf:
+				self.assertEqual(regf.read(), '')
 
 	# assertions #
 
