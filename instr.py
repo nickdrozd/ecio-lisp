@@ -1,4 +1,16 @@
+'''
+	TODO:
+		* move dispatch table to labels? elsewhere?
+		* figure out DONE
+'''
+
 from reg import *
+from labels import *
+
+from env import initialize_env
+
+from evalExp import evalExp
+from evalFuncs import *
 
 INSTR = 'INSTR'
 DONE = 'done'
@@ -15,18 +27,36 @@ def goto_eval():
 def initialize_cont():
 	assign(CONT, DONE)
 
-def execute():
-	labels = {
-		EVAL_EXP: evalExp
-	}
+def initialize():
+	initialize_env()
+	initialize_cont()
+	goto_eval()
 
+def step():
 	label = fetch(INSTR)
 
+	labels = {
+		EVAL_EXP : evalExp,
+		DID_DEF_VAL : did_def_val,
+		IF_DECIDE : if_decide,
+		IF_ELSE : if_else
+	}
+
 	try:
-		label()
+		next_instr = labels[label]
 	except:
 		raise Exception('Unknown label: {}'.format(label))
 
-# labels (separate file?)
+	if next_instr == DONE:
+		goto_eval()
+		return
+	else:
+		next_instr()
 
-EVAL_EXP = 'EVAL_EXP'
+def done():
+	return fetch(INSTR) == DONE
+
+def run():
+	initialize()
+	while not done():
+		step()
