@@ -9,23 +9,100 @@ from env import *
 from parse import parse
 
 
-class EvalTest(unittest.TestCase):
+class RegFileTests(unittest.TestCase):
+	# def __init__(self, *args, **kwargs):
+	# 	super().__init__(*args, **kwargs)
+	# 	self.verbose = 1
 
-	# setup #
-
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		self.verbose = 1
-		
 	def setUp(self):
-		# ensure files exist?
-		# clear_registers()
-		# clear_stack()
 		self.display()
 
 	def tearDown(self):
-		# initialize()
 		self.display()
+
+	# assertsions #
+
+	def assert_before_func_after(self, before, func, after):
+		'''
+		before and after are dicts, func a function
+		'''
+		self.set_up_registers(before)
+		func()
+		self.verify_outcome(after)
+
+	def set_up_registers(self, setup):
+		for reg in setup:
+			self.assign_and_verify(reg, setup[reg])
+
+	def verify_outcome(self, expected):
+		for reg in expected:
+			self.assert_reg_contents(reg, expected[reg])
+
+	def assign_and_verify(self, reg, contents):
+		msg = 'assigning {} to {}...'
+		self.display(msg.format(contents, reg))
+		assign(reg, contents)
+		self.assert_reg_contents(reg, contents)
+
+	def assert_reg_contents(self, reg, expected):
+		contents = fetch(reg)
+		self.display_expected_actual(reg, expected, contents)
+		self.assertEqual(contents, expected)
+
+	# utilities #
+
+	def display_expected_actual(self, reg, expected, actual):
+		msg = '{} -- expected: {} -- actual: {}'
+		self.display(msg.format(reg, expected, actual))
+
+	def display(self, msg=''):
+		if self.verbose:
+			print(msg)
+
+
+class RunTest(RegFileTests):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.verbose = 1
+
+	def setUp(self):
+		super().setUp()
+		initialize()
+
+		
+	def test_num(self):
+		numbers = 0, 5, 1000000
+
+		for num in numbers:
+			self.assert_run_before_after(
+				{EXPR : num},
+				{VAL : num})
+
+
+	def test_quote(self):
+		quotes = map(parse, (
+			'(quote (mauve taupe sepia))',
+			'(quote (1 2 3))',
+			'(quote ())',
+			'(quote quote)',
+			'(quote (quote (quote teal))))',
+		))
+
+		for quote in quotes:
+			_, text = quote
+			self.assert_run_before_after(
+				{EXPR : quote},
+				{VAL : text})
+
+
+	def assert_run_before_after(self, before, after):
+		self.assert_before_func_after(before, run, after)
+
+
+class UnitTests(RegFileTests):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.verbose = 0
 
 	# environment operations #
 
@@ -166,22 +243,6 @@ class EvalTest(unittest.TestCase):
 
 	# assertions #
 
-	def assert_before_func_after(self, before, func, after):
-		'''
-		before and after are dicts, func a function
-		'''
-		self.set_up_registers(before)
-		func()
-		self.verify_outcome(after)
-
-	def set_up_registers(self, setup):
-		for reg in setup:
-			self.assign_and_verify(reg, setup[reg])
-
-	def verify_outcome(self, expected):
-		for reg in expected:
-			self.assert_reg_contents(reg, expected[reg])
-
 	def goto_eval_and_verify(self):
 		goto_eval()
 		self.assert_reg_contents(INSTR, EVAL_EXP)
@@ -244,20 +305,9 @@ class EvalTest(unittest.TestCase):
 		for reg, contents in pairs:
 			self.assign_and_verify(reg, contents)
 
-	def assign_and_verify(self, reg, contents):
-		msg = 'assigning {} to {}...'
-		self.display(msg.format(contents, reg))
-		assign(reg, contents)
-		self.assert_reg_contents(reg, contents)
-
 	def assert_reg_contents_pairs(self, *pairs):
 		for reg, expected in pairs:
 			self.assert_reg_contents(reg, expected)
-
-	def assert_reg_contents(self, reg, expected):
-		contents = fetch(reg)
-		self.display_expected_actual(reg, expected, contents)
-		self.assertEqual(contents, expected)
 
 	# utilities #
 
@@ -277,14 +327,6 @@ class EvalTest(unittest.TestCase):
 		with open(STACK, 'r') as stack:
 			stack_contents = stack.read().split('\n')
 			self.display('STACK: ' + str(stack_contents))
-
-	def display_expected_actual(self, reg, expected, actual):
-		msg = '{} -- expected: {} -- actual: {}'
-		self.display(msg.format(reg, expected, actual))
-
-	def display(self, msg=''):
-		if self.verbose:
-			print(msg)
 
 
 if __name__ == '__main__':
