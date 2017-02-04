@@ -85,46 +85,83 @@ def if_else():
 
 ###
 
-# def evalFunc():
-# 	save(CONT)
-# 	func, *args = fetch(EXPR)
-# 	assign(EXPR, func)
-# 	assign(UNEV, args)
-# 	save(ENV)
-# 	save(UNEV)
-# 	set_continue(DID_FUNC)
-# 	instr.goto_eval()
+def evalFunc():
+	save(CONT)
+	save(ENV)
 
-# def did_func():
-# 	restore(UNEV) # args
-# 	restore(ENV)
-# 	assign(FUNC, fetch(VAL))
+	func, *args = fetch(EXPR)
+	assign(EXPR, func)
+	assign(UNEV, args)
 
-# 	save(FUNC)
-# 	# cont is already saved
-# 	instr.goto(CHECK_NO_ARGS)
+	save(UNEV)
 
-# def check_no_args():
-# 	set_empty_arglist()
-# 	if not fetch(UNEV): # if no_args():
-# 		instr.goto(APPLY)
-# 		return
-# 	# if noCompoundArgs(): ...
-# 	save(func)
-# 	instr.goto(ARG_LOOP)
+	set_continue(DID_FUNC)
+	instr.goto_eval()
 
-# def arg_loop():
-# 	save(ARGL)
-# 	first, *rest = fetch(UNEV)
-# 	if not rest: # if no_remaining_args():
-# 		instr.goto(LAST_ARG)
-# 		return
-# 	save(UNEV)
-# 	save(ENV)
-# 	set_continue(ACC_ARG)
-# 	instr.goto_eval()
+def did_func():
+	restore(UNEV) # args
+	restore(ENV)
 
+	assign(FUNC, fetch(VAL))
+	set_empty_arglist()
 
+	# cont is still/already saved
+	instr.goto(CHECK_NO_ARGS)
+
+def check_no_args():
+	if not fetch(UNEV): # if no_args():
+		instr.goto(APPLY)
+		return
+
+	# if noCompoundArgs(): ...
+	save(func)
+	instr.goto(ARG_LOOP)
+
+def arg_loop():
+	save(ARGL)
+
+	first, *rest = fetch(UNEV)
+	if not rest: # if no_remaining_args():
+		instr.goto(LAST_ARG)
+		return
+
+	assign(EXPR, first)
+	assign(UNEV, rest)
+
+	save(ENV)
+	save(UNEV)
+
+	set_continue(ACC_ARG)
+	instr.goto_eval()
+
+def acc_arg():
+	restore(UNEV)
+	restore(ENV)
+
+	restore(ARGL)
+
+	args = fetch(ARGL) + [fetch(VAL)]
+	assign(ARGL, args)
+
+	instr.goto(ARG_LOOP)
+
+def last_arg():
+	restore(ARGL)
+
+	args = fetch(ARGL) + [fetch(VAL)]
+	assign(ARGL, args)
+
+	restore(FUNC)
+
+	instr.goto(APPLY)
+
+###
+
+def applyFunc():
+	if is_primitive_func():
+		instr.goto(APPLY_PRIMITIVE)
+	if is_compound_func():
+		instr.goto(APPLY_COMPOUND)
 
 
 

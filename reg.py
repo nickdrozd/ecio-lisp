@@ -21,6 +21,9 @@ def assign(reg, val):
 def set_continue(label):
 	assign(CONT, label)
 
+def set_empty_arglist():
+	assign(ARGL, [])
+
 def clear_register(reg):
 	with open(reg, 'w'):
 		pass
