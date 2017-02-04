@@ -7,8 +7,6 @@
 from reg import *
 from labels import *
 
-from env import initialize_env
-
 from evalExp import evalExp
 from evalFuncs import *
 
@@ -28,7 +26,6 @@ def initialize_cont():
 	assign(CONT, DONE)
 
 def initialize():
-	initialize_env()
 	initialize_cont()
 	goto_eval()
 

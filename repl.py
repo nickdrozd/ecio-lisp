@@ -1,4 +1,5 @@
 from reg import *
+from env import initialize_env
 from instr import run
 from parse import parse
 
@@ -7,6 +8,7 @@ INTERPRETER_EXIT = '.quit', '.exit'
 EXIT_MESSAGE = 'Byeeeeeeee!'
 
 def repl():
+	initialize_env()
 	while True:
 		try:
 			get_expr()
