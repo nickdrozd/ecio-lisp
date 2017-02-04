@@ -31,7 +31,7 @@ def evalLambda():
 	_, params, *body = fetch(EXPR)
 	assign(UNEV, params)
 	assign(EXPR, body)
-	assign(VAL, [fetch(ENV), fetch(UNEV), fetch(EXPR)])
+	assign(VAL, [fetch(UNEV), fetch(EXPR), fetch(ENV)])
 	instr.goto_continue()
 
 ###
