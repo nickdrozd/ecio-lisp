@@ -1,50 +1,52 @@
 from reg import *
 
 '''
-ENV consists of pair
-[
-	{<frame vals>},
-	[<lower env / empty>]
-]
+ENV is a list of dicts, ordered by scope
 '''
 
 UNBOUND = 'UNBOUND'
 
+
 def lookup(reg):
-	frame, lower = fetch(ENV)
+	"lookup the value of the contents of reg"
+
 	var = fetch(reg)
-	
-	while frame:
+	env = fetch(ENV)
+
+	for frame in env:
 		if var in frame:
 			return frame[var]
-		elif lower:
-			frame, lower = lower
-		else:
-			return UNBOUND
+
+	return UNBOUND
 
 def defineVar():
-	frame, lower = fetch(ENV)
-	var, val = fetch(UNEV), fetch(VAL)
-	frame[var] = val
-	assign(ENV, [frame, lower])
+	"bind the contents of UNEV to the contents of VAL in the newest frame"
+	var, val, env = _get_var_val_env()
+
+	try:
+		env[0][var] = val
+	except KeyError:
+		env = {var : val}
+
+	assign(ENV, env)
 
 def setVar():
-	frame, lower = fetch(ENV)
-	var, val = fetch(UNEV), fetch(VAL)
+	var, val, env = _get_var_val_env()
 
-	while frame:
+	for frame in env:
 		if var in frame:
 			frame[var] = val
-			assign(ENV, [frame, lower])
-			break
-		elif lower:
-			frame, lower = lower
-		else:
-			break
-			# raise exception? return dummy val
+			assign(ENV, env)
+			return
+
+	# raise exception? return dummy val?
 
 def initial_env():
-	return [ {}, [] ]
+	return [ {} ]
 
 def initialize_env():
 	assign(ENV, initial_env())
+
+def _get_var_val_env():
+	regs = UNEV, VAL, ENV
+	return [fetch(reg) for reg in regs]

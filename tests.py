@@ -60,7 +60,7 @@ class RegFileTests(unittest.TestCase):
 			print(msg)
 
 
-class RunTest(RegFileTests):
+class RunTests(RegFileTests):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.verbose = 1
@@ -108,10 +108,8 @@ class UnitTests(RegFileTests):
 
 	def test_lookup(self):
 		env = [
-			{'ragdoll': 4}, [
-				{'sphynx': 5},
-				[]
-			]
+			{'ragdoll': 4},
+			{'sphynx': 5},
 		]
 
 		pairs = (
@@ -121,26 +119,27 @@ class UnitTests(RegFileTests):
 
 		self.assign_and_verify(ENV, env)
 
+		lookup_reg = EXPR
 		for var, val in pairs:
-			self.assign_and_verify(VAL, var)
-			self.assertEqual(val, lookup(VAL))
+			self.assign_and_verify(lookup_reg, var)
+			self.display('looking up {}...'.format(lookup_reg))
+			lookup_val = lookup(lookup_reg)
+			self.display_expected_actual(
+				'lookup({})'.format(lookup_reg), val, lookup_val)
+			self.assertEqual(val, lookup_val)
 
 
 	def test_define_var(self):
 		initial_env = [
-			{'trout': 4}, [
-				{'cod': 5},
-				[]
-			]
+			{'trout': 4},
+			{'cod': 5},
 		]
 
 		var, val = 'halibut', 6
 
 		expected_env = [
-			{'trout': 4, 'halibut': 6}, [
-				{'cod': 5},
-				[]
-			]
+			{'trout': 4, 'halibut': 6},
+			{'cod': 5},
 		]
 
 		before = {
@@ -156,6 +155,7 @@ class UnitTests(RegFileTests):
 		}
 
 		self.assert_before_func_after(before, func, after)
+
 
 	# basic register tests #
 
