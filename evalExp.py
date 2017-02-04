@@ -20,7 +20,7 @@ def getEvalFunc(expr):
 	tag, *_ = expr
 
 	keyword_groups = {
-		# define_keys : evalDef, 
+		define_keys : evalDef, 
 		# ass_keys : evalAss, 
 		lambda_keys : evalLambda, 
 		if_keys : evalIf, 

@@ -67,9 +67,29 @@ class RunTests(RegFileTests):
 
 	def setUp(self):
 		super().setUp()
+		initial_env()
 		initialize()
 
-		
+
+	# def test_define(self):
+
+
+
+
+
+
+	def test_if(self):
+		conds = {
+			'(if 3 4 5)' : 4,
+			'(if 0 4 5)' : 5,
+		}
+
+		for code, result in conds.items():
+			self.assert_run_before_after(
+				{EXPR : parse(code)},
+				{VAL : result})
+
+
 	def test_num(self):
 		numbers = 0, 5, 1000000
 

@@ -36,6 +36,7 @@ def step():
 		EVAL_EXP : evalExp,
 		DID_DEF_VAL : did_def_val,
 		IF_DECIDE : if_decide,
+		IF_THEN : if_then,
 		IF_ELSE : if_else
 	}
 
