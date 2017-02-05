@@ -163,9 +163,24 @@ def applyFunc():
 	if is_compound_func():
 		instr.goto(APPLY_COMPOUND)
 
+def apply_primitive():
+	apply_primitive_func()
 
+	restore(CONT)
 
+	goto_continue()
 
+def apply_compound():
+	# this needs to agree with eval_lambda
+	params, body, env = fetch(FUNC)
+
+	assign(UNEV, params)
+	assign(ENV, env)
+	extend_env()
+
+	assign(UNEV, body)
+
+	instr.goto(EVAL_SEQ)
 
 
 
