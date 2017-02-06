@@ -9,6 +9,7 @@ from env import *
 # from instr import instr.goto, instr.goto_continue, instr.goto_eval
 import instr
 from labels import *
+from prim import *
 
 ###
 
@@ -110,11 +111,11 @@ def did_func():
 
 def check_no_args():
 	if not fetch(UNEV): # if no_args():
-		instr.goto(APPLY)
+		instr.goto(APPLY_FUNC)
 		return
 
 	# if noCompoundArgs(): ...
-	save(func)
+	save(FUNC)
 	instr.goto(ARG_LOOP)
 
 def arg_loop():
@@ -148,19 +149,20 @@ def acc_arg():
 def last_arg():
 	restore(ARGL)
 
-	args = fetch(ARGL) + [fetch(VAL)]
+	args = fetch(ARGL) + fetch(UNEV)
 	assign(ARGL, args)
 
 	restore(FUNC)
 
-	instr.goto(APPLY)
+	instr.goto(APPLY_FUNC)
 
 ###
 
 def applyFunc():
 	if is_primitive_func():
 		instr.goto(APPLY_PRIMITIVE)
-	if is_compound_func():
+	# if is_compound_func():
+	else:
 		instr.goto(APPLY_COMPOUND)
 
 def apply_primitive():
@@ -168,7 +170,7 @@ def apply_primitive():
 
 	restore(CONT)
 
-	goto_continue()
+	instr.goto_continue()
 
 def apply_compound():
 	# this needs to agree with eval_lambda
@@ -182,12 +184,62 @@ def apply_compound():
 
 	instr.goto(EVAL_SEQ)
 
+###
 
+def eval_seq():
+	first, *rest = fetch(UNEV)
 
+	# if last_exp...
+	if not rest:
+		instr.goto(EVAL_SEQ_LAST)
+		return
 
+	assign(EXPR, first)
+	assign(UNEV, rest)
 
+	save(UNEV)
+	save(ENV)
 
+	set_continue(EVAL_SEQ_CONT)
 
+	instr.goto_eval()
+
+def eval_seq_cont():
+	restore(ENV)
+	restore(UNEV)
+
+	instr.goto(EVAL_SEQ)
+
+def eval_seq_last():
+	restore(CONT)
+
+	instr.goto_eval()
+
+###
+
+def alt_eval_seq():
+	exps = fetch(UNEV)
+
+	# if no_exps...
+	if not exps:
+		instr.goto(EVAL_SEQ_END)
+		return
+
+	first, *rest = fetch(UNEV)
+
+	assign(EXPR, first)
+	assign(UNEV, rest)
+
+	save(UNEV)
+	save(ENV)
+
+	set_continue(EVAL_SEQ_CONT_A)
+
+	instr.goto_eval()
+
+def alt_eval_seq_end():
+	restore(CONT)
+	instr.goto_continue()
 
 
 

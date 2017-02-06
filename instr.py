@@ -34,10 +34,30 @@ def step():
 
 	labels = {
 		EVAL_EXP : evalExp,
+
 		DID_DEF_VAL : did_def_val,
+
 		IF_DECIDE : if_decide,
 		IF_THEN : if_then,
-		IF_ELSE : if_else
+		IF_ELSE : if_else,
+
+		DID_FUNC : did_func,
+		CHECK_NO_ARGS : check_no_args,
+		LAST_ARG : last_arg,
+		ARG_LOOP : arg_loop,
+		ACC_ARG : acc_arg,
+
+		APPLY_FUNC : applyFunc,
+
+		APPLY_PRIMITIVE : apply_primitive,
+		APPLY_COMPOUND : apply_compound,
+
+		EVAL_SEQ : eval_seq,
+		EVAL_SEQ_CONT : eval_seq_cont,
+		EVAL_SEQ_LAST : eval_seq_last,
+
+		ALT_EVAL_SEQ : alt_eval_seq,
+		ALT_EVAL_SEQ_END : alt_eval_seq_end,
 	}
 
 	try:
@@ -57,4 +77,5 @@ def done():
 def run():
 	initialize()
 	while not done():
+		show_registers()
 		step()

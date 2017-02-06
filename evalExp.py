@@ -33,7 +33,7 @@ def getEvalFunc(expr):
 			return keyword_groups[group]
 
 	# default
-	return evalApp
+	return evalFunc
 
 
 def isNum(exp):
