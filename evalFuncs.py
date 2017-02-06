@@ -122,11 +122,14 @@ def arg_loop():
 	save(ARGL)
 
 	first, *rest = fetch(UNEV)
-	if not rest: # if no_remaining_args():
-		instr.goto(LAST_ARG)
-		return
 
 	assign(EXPR, first)
+
+	if not rest: # if no_remaining_args():
+		set_continue(LAST_ARG)
+		instr.goto_eval()
+		return
+
 	assign(UNEV, rest)
 
 	save(ENV)
@@ -189,12 +192,13 @@ def apply_compound():
 def eval_seq():
 	first, *rest = fetch(UNEV)
 
+	assign(EXPR, first)
+
 	# if last_exp...
 	if not rest:
 		instr.goto(EVAL_SEQ_LAST)
 		return
 
-	assign(EXPR, first)
 	assign(UNEV, rest)
 
 	save(UNEV)
