@@ -41,6 +41,17 @@ def setVar():
 
 	# raise exception? return dummy val?
 
+def extend_env():
+	env = fetch(ENV)
+	params = fetch(UNEV)
+	args = fetch(ARGL)
+
+	new_frame = dict(zip(params, args))
+
+	ext_env = [new_frame] + env
+
+	assign(ENV, ext_env)
+
 def initial_env():
 	return [ {} ]
 
