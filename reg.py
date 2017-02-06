@@ -31,6 +31,3 @@ def clear_register(reg):
 def clear_registers():
 	for reg in REGISTERS:
 		clear_register(reg)
-
-def show_register(reg):
-	print(fetch(reg))

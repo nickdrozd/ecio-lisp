@@ -6,12 +6,15 @@
 
 from reg import *
 from labels import *
+from stack import clear_stack
 
 from evalExp import evalExp
 from evalFuncs import *
 
+from info import display_info
+
 INSTR = 'INSTR'
-DONE = 'done'
+DONE = 'DONE'
 
 def goto(label):
 	assign(INSTR, label)
@@ -26,6 +29,7 @@ def initialize_cont():
 	assign(CONT, DONE)
 
 def initialize():
+	clear_stack()
 	initialize_cont()
 	goto_eval()
 
@@ -77,5 +81,5 @@ def done():
 def run():
 	initialize()
 	while not done():
-		show_registers()
+		display_info()
 		step()
