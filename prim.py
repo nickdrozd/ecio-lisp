@@ -6,7 +6,7 @@
 
 import operator
 
-from reg *
+from reg import *
 
 prim_add = '_+'
 prim_mul = '_*'
@@ -17,15 +17,20 @@ primitives = {
 	prim_add : operator.add,
 	prim_mul : operator.mul,
 	prim_sub : operator.sub,
-	prim_div : operator.div,
+	prim_div : operator.truediv,
 }
 
 def is_primitive_func():
-	return fetch(FUNC) in primitives
+	try:
+		return fetch(FUNC) in primitives
+	except:
+		return False
 
 # prim funcs assumed to take two args
 def apply_primitive_func():
 	func = primitives[fetch(FUNC)]
 	arg1, arg2 = fetch(ARGL)
+
+	result = func(arg1, arg2)
 
 	assign(VAL, func(arg1, arg2))

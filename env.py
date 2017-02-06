@@ -1,4 +1,5 @@
 from reg import *
+from prim import primitives
 
 '''
 ENV is a list of dicts, ordered by scope
@@ -11,6 +12,10 @@ def lookup(reg):
 	"lookup the value of the contents of reg"
 
 	var = fetch(reg)
+
+	if var in primitives:
+		return var
+
 	env = fetch(ENV)
 
 	for frame in env:
