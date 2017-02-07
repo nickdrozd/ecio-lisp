@@ -5,16 +5,14 @@
 '''
 
 from reg import *
-from labels import *
 from stack import clear_stack
 
-from evalExp import evalExp
-from evalFuncs import *
+from labels import *
+from switch import switch
 
 from info import display_info
 
 INSTR = 'INSTR'
-DONE = 'DONE'
 
 def goto(label):
 	assign(INSTR, label)
@@ -36,36 +34,8 @@ def initialize():
 def step():
 	label = fetch(INSTR)
 
-	labels = {
-		EVAL_EXP : evalExp,
-
-		DID_DEF_VAL : did_def_val,
-
-		IF_DECIDE : if_decide,
-		IF_THEN : if_then,
-		IF_ELSE : if_else,
-
-		DID_FUNC : did_func,
-		CHECK_NO_ARGS : check_no_args,
-		LAST_ARG : last_arg,
-		ARG_LOOP : arg_loop,
-		ACC_ARG : acc_arg,
-
-		APPLY_FUNC : applyFunc,
-
-		APPLY_PRIMITIVE : apply_primitive,
-		APPLY_COMPOUND : apply_compound,
-
-		EVAL_SEQ : eval_seq,
-		EVAL_SEQ_CONT : eval_seq_cont,
-		EVAL_SEQ_LAST : eval_seq_last,
-
-		ALT_EVAL_SEQ : alt_eval_seq,
-		ALT_EVAL_SEQ_END : alt_eval_seq_end,
-	}
-
 	try:
-		next_instr = labels[label]
+		next_instr = switch[label]
 	except:
 		raise Exception('Unknown label: {}'.format(label))
 

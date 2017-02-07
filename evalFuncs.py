@@ -13,22 +13,22 @@ from prim import *
 
 ###
 
-def evalNum():
+def eval_num():
 	assign(VAL, fetch(EXPR))
 	instr.goto_continue()
 
-def evalVar():
+def eval_var():
 	assign(VAL, lookup(EXPR))
 	instr.goto_continue()
 
-def evalQuote():
+def eval_quote():
 	_, text = fetch(EXPR)
 	assign(VAL, text)
 	instr.goto_continue()
 
 ###
 
-def evalLambda():
+def eval_lambda():
 	_, params, *body = fetch(EXPR)
 	assign(UNEV, params)
 	assign(EXPR, body)
@@ -37,7 +37,7 @@ def evalLambda():
 
 ###
 
-def evalDef():
+def eval_def():
 	_, var, val = fetch(EXPR)
 	assign(UNEV, var)
 	assign(EXPR, val)
@@ -56,7 +56,7 @@ def did_def_val():
 
 ###
 
-def evalIf():
+def eval_if():
 	save(ENV)
 	save(CONT)
 	save(EXPR)
@@ -86,7 +86,7 @@ def if_else():
 
 ###
 
-def evalFunc():
+def eval_func():
 	save(CONT)
 	save(ENV)
 
@@ -150,9 +150,13 @@ def acc_arg():
 	instr.goto(ARG_LOOP)
 
 def last_arg():
+	set_continue(DID_LAST_ARG)
+	instr.goto_eval()
+
+def did_last_arg():
 	restore(ARGL)
 
-	args = fetch(ARGL) + fetch(UNEV)
+	args = fetch(ARGL) + [fetch(VAL)]
 	assign(ARGL, args)
 
 	restore(FUNC)
@@ -161,7 +165,7 @@ def last_arg():
 
 ###
 
-def applyFunc():
+def apply_func():
 	if is_primitive_func():
 		instr.goto(APPLY_PRIMITIVE)
 	# if is_compound_func():
@@ -237,7 +241,7 @@ def alt_eval_seq():
 	save(UNEV)
 	save(ENV)
 
-	set_continue(EVAL_SEQ_CONT_A)
+	set_continue(EVAL_SEQ_CONT)
 
 	instr.goto_eval()
 
