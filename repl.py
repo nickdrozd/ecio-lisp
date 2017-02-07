@@ -17,9 +17,9 @@ def repl():
 		except KeyboardInterrupt:
 			print()
 			break
-		except Exception as e: # better way to do this?
-			print(e)
-			break
+		# except Exception as e: # better way to do this?
+		# 	print(e)
+		# 	break
 
 def get_expr():	
 	expr = parse(input(INTERPRETER_PROMPT))
