@@ -17,7 +17,7 @@ primitives = {
 	prim_add : operator.add,
 	prim_mul : operator.mul,
 	prim_sub : operator.sub,
-	prim_div : operator.truediv,
+	prim_div : operator.floordiv,
 }
 
 def is_primitive_func():
