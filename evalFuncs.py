@@ -143,9 +143,7 @@ def acc_arg():
 	restore(ENV)
 
 	restore(ARGL)
-
-	args = fetch(ARGL) + [fetch(VAL)]
-	assign(ARGL, args)
+	adjoin_arg()
 
 	instr.goto(ARG_LOOP)
 
@@ -155,9 +153,7 @@ def last_arg():
 
 def did_last_arg():
 	restore(ARGL)
-
-	args = fetch(ARGL) + [fetch(VAL)]
-	assign(ARGL, args)
+	adjoin_arg()
 
 	restore(FUNC)
 
