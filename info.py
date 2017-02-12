@@ -1,6 +1,6 @@
 '''
-	TODO:
-		* move INFO flag to config register
+    TODO:
+        * move INFO flag to config register
 '''
 
 import json
@@ -12,31 +12,31 @@ import instr
 INFO = 1
 
 def display_info():
-	if INFO:
-		show_instr()
-		show_registers()
-		show_stack()
-		print()
-		divider('*')
+    if INFO:
+        show_instr()
+        show_registers()
+        show_stack()
+        print()
+        divider('*')
 
 def show_register(reg):
-	divider('-')
-	print(reg)
-	print(fetch(reg))
+    divider('-')
+    print(reg)
+    print(fetch(reg))
 
 def show_registers():
-	for reg in REGISTERS:
-		show_register(reg)
-	divider('-')
+    for reg in REGISTERS:
+        show_register(reg)
+    divider('-')
 
 def show_stack():
-	print(STACK)
-	for entry in fetch(STACK):
-		print(' *', entry)
+    print(STACK)
+    for entry in fetch(STACK):
+        print(' *', entry)
 
 def show_instr():
-	print(instr.INSTR)
-	print(fetch(instr.INSTR))
+    print(instr.INSTR)
+    print(fetch(instr.INSTR))
 
 def divider(char):
-	print(char * 5)
+    print(char * 5)

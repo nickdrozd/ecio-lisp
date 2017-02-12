@@ -13,31 +13,31 @@ REGISTERS = EXPR, VAL, ENV, UNEV, FUNC, ARGL, CONT
 # basic register operations
 
 def fetch(reg):
-	with open(reg, 'r') as regf:
-		return json.loads(regf.read())
+    with open(reg, 'r') as regf:
+        return json.loads(regf.read())
 
 def assign(reg, val):
-	with open(reg, 'w') as regf:
-		regf.write(json.dumps(val))
+    with open(reg, 'w') as regf:
+        regf.write(json.dumps(val))
 
 def clear_register(reg):
-	with open(reg, 'w'):
-		pass
+    with open(reg, 'w'):
+        pass
 
 def clear_registers():
-	for reg in REGISTERS:
-		clear_register(reg)
+    for reg in REGISTERS:
+        clear_register(reg)
 
 # particular register operations
 
 def set_continue(label):
-	assign(CONT, label)
+    assign(CONT, label)
 
 def set_empty_arglist():
-	assign(ARGL, [])
+    assign(ARGL, [])
 
 def adjoin_arg():
-	curr_args = fetch(ARGL)
-	new_arg = fetch(VAL)
-	adjoined = curr_args + [new_arg]
-	assign(ARGL, adjoined)
+    curr_args = fetch(ARGL)
+    new_arg = fetch(VAL)
+    adjoined = curr_args + [new_arg]
+    assign(ARGL, adjoined)

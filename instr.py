@@ -1,7 +1,7 @@
 '''
-	TODO:
-		* move dispatch table to labels? elsewhere?
-		* figure out DONE
+    TODO:
+        * move dispatch table to labels? elsewhere?
+        * figure out DONE
 '''
 
 from reg import *
@@ -15,41 +15,41 @@ from info import display_info
 INSTR = 'INSTR'
 
 def goto(label):
-	assign(INSTR, label)
+    assign(INSTR, label)
 
 def goto_continue():
-	goto(fetch(CONT))
+    goto(fetch(CONT))
 
 def goto_eval():
-	goto(EVAL_EXP)
+    goto(EVAL_EXP)
 
 def initialize_cont():
-	assign(CONT, DONE)
+    assign(CONT, DONE)
 
 def initialize():
-	clear_stack()
-	initialize_cont()
-	goto_eval()
+    clear_stack()
+    initialize_cont()
+    goto_eval()
 
 def step():
-	label = fetch(INSTR)
+    label = fetch(INSTR)
 
-	try:
-		next_instr = switch[label]
-	except:
-		raise Exception('Unknown label: {}'.format(label))
+    try:
+        next_instr = switch[label]
+    except:
+        raise Exception('Unknown label: {}'.format(label))
 
-	if next_instr == DONE:
-		goto_eval()
-		return
-	else:
-		next_instr()
+    if next_instr == DONE:
+        goto_eval()
+        return
+    else:
+        next_instr()
 
 def done():
-	return fetch(INSTR) == DONE
+    return fetch(INSTR) == DONE
 
 def run():
-	initialize()
-	while not done():
-		display_info()
-		step()
+    initialize()
+    while not done():
+        display_info()
+        step()

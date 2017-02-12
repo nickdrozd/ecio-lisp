@@ -1,6 +1,6 @@
 '''
-	TODO:
-		* figure out persisting global env
+    TODO:
+        * figure out persisting global env
 '''
 
 from reg import *
@@ -14,60 +14,60 @@ UNBOUND = 'UNBOUND'
 
 
 def lookup(reg):
-	"lookup the value of the contents of reg"
+    "lookup the value of the contents of reg"
 
-	var = fetch(reg)
+    var = fetch(reg)
 
-	if var in primitives:
-		return var
+    if var in primitives:
+        return var
 
-	env = fetch(ENV)
+    env = fetch(ENV)
 
-	for frame in env:
-		if var in frame:
-			return frame[var]
+    for frame in env:
+        if var in frame:
+            return frame[var]
 
-	return UNBOUND
+    return UNBOUND
 
 def defineVar():
-	"bind the contents of UNEV to the contents of VAL in the newest frame"
-	var, val, env = _get_var_val_env()
+    "bind the contents of UNEV to the contents of VAL in the newest frame"
+    var, val, env = _get_var_val_env()
 
-	try:
-		env[0][var] = val
-	except KeyError:
-		env = {var : val}
+    try:
+        env[0][var] = val
+    except KeyError:
+        env = {var : val}
 
-	assign(ENV, env)
+    assign(ENV, env)
 
 def setVar():
-	var, val, env = _get_var_val_env()
+    var, val, env = _get_var_val_env()
 
-	for frame in env:
-		if var in frame:
-			frame[var] = val
-			assign(ENV, env)
-			return
+    for frame in env:
+        if var in frame:
+            frame[var] = val
+            assign(ENV, env)
+            return
 
-	# raise exception? return dummy val?
+    # raise exception? return dummy val?
 
 def extend_env():
-	env = fetch(ENV)
-	params = fetch(UNEV)
-	args = fetch(ARGL)
+    env = fetch(ENV)
+    params = fetch(UNEV)
+    args = fetch(ARGL)
 
-	new_frame = dict(zip(params, args))
+    new_frame = dict(zip(params, args))
 
-	ext_env = [new_frame] + env
+    ext_env = [new_frame] + env
 
-	assign(ENV, ext_env)
+    assign(ENV, ext_env)
 
 def initial_env():
-	return [ {} ]
+    return [{}]
 
 def initialize_env():
-	assign(ENV, initial_env())
+    assign(ENV, initial_env())
 
 def _get_var_val_env():
-	regs = UNEV, VAL, ENV
-	return [fetch(reg) for reg in regs]
+    regs = UNEV, VAL, ENV
+    return [fetch(reg) for reg in regs]

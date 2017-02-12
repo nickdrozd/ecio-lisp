@@ -10,15 +10,15 @@ from reg import fetch, assign
 STACK = 'STACK'
 
 def save(reg):
-	reg_contents = fetch(reg)
-	stack = fetch(STACK)
-	join = [reg_contents] + stack
-	assign(STACK, join)
+    reg_contents = fetch(reg)
+    stack = fetch(STACK)
+    join = [reg_contents] + stack
+    assign(STACK, join)
 
 def restore(reg):
-	top, *rest = fetch(STACK)
-	assign(reg, top)
-	assign(STACK, rest)
+    top, *rest = fetch(STACK)
+    assign(reg, top)
+    assign(STACK, rest)
 
 def clear_stack():
-	assign(STACK, [])
+    assign(STACK, [])
