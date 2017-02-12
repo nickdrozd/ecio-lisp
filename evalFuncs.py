@@ -126,8 +126,7 @@ def arg_loop():
 	assign(EXPR, first)
 
 	if not rest: # if no_remaining_args():
-		set_continue(LAST_ARG)
-		instr.goto_eval()
+		instr.goto(LAST_ARG)
 		return
 
 	assign(UNEV, rest)
