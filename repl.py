@@ -8,8 +8,8 @@ INTERPRETER_EXIT = '.quit', '.exit'
 EXIT_MESSAGE = 'Byeeeeeeee!'
 
 def repl():
-	initialize_env()
 	while True:
+		initialize_env() # should be load_global_env
 		try:
 			get_expr()
 			run()

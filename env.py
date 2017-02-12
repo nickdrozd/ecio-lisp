@@ -1,3 +1,8 @@
+'''
+	TODO:
+		* figure out persisting global env
+'''
+
 from reg import *
 from prim import primitives
 
