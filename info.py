@@ -9,7 +9,7 @@ from reg import fetch, REGISTERS
 from stack import STACK
 import instr
 
-INFO = 0
+INFO = 1
 
 def display_info():
 	if INFO:
@@ -30,10 +30,9 @@ def show_registers():
 	divider('-')
 
 def show_stack():
-	with open(STACK, 'r') as stack:
-		items = stack.readlines()
-		print(STACK)
-		print(items)
+	print(STACK)
+	for entry in fetch(STACK):
+		print(' *', entry)
 
 def show_instr():
 	print(instr.INSTR)

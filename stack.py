@@ -1,21 +1,24 @@
+'''
+The stack is conceptually distinct from the
+registers, but in terms of file I/O, it will
+work the same, so it will be implemented
+using basic register operations.
+'''
+
+from reg import fetch, assign
+
 STACK = 'STACK'
 
 def save(reg):
-	with open(STACK, 'r+') as stack, open(reg, 'r') as regf:
-		joiner = '' if stack.read() == '' else '\n'
-		stack.write(joiner + regf.read())
-
+	reg_contents = fetch(reg)
+	stack = fetch(STACK)
+	join = [reg_contents] + stack
+	assign(STACK, join)
 
 def restore(reg):
-	with open(STACK, 'r+') as stack, open(reg, 'w') as regf:
-		*tail, head = stack.read().split('\n')
-		# print('TAIL:', tail)
-		# print('HEAD:', head)
-		regf.write(head)
-		tail = '\n'.join(tail)
-		stack.seek(len(tail))
-		stack.truncate()
+	top, *rest = fetch(STACK)
+	assign(reg, top)
+	assign(STACK, rest)
 
 def clear_stack():
-	with open(STACK, 'w'):
-		pass
+	assign(STACK, [])
