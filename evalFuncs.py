@@ -9,7 +9,7 @@ from env import *
 # from instr import instr.goto, instr.goto_continue, instr.goto_eval
 import instr
 from labels import *
-from prim import *
+from prim import is_primitive_func, apply_primitive_func
 
 ###
 

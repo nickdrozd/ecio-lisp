@@ -1,6 +1,7 @@
 from keywords import *
-from reg import *
+from reg import fetch, EXPR
 from labels import *
+# from instr import goto
 import instr
 
 def eval_exp():
@@ -8,7 +9,6 @@ def eval_exp():
     # expr = transformMacros(expr)
     eval_label = get_eval_label(expr)
     instr.goto(eval_label)
-
 
 def get_eval_label(expr):
     if isVar(expr):
@@ -35,7 +35,6 @@ def get_eval_label(expr):
 
     # default
     return EVAL_FUNC
-
 
 def isNum(exp):
     try:

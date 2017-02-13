@@ -1,4 +1,4 @@
-from reg import *
+from reg import fetch, assign, EXPR, VAL
 from env import initialize_env
 from instr import run
 from parse import parse

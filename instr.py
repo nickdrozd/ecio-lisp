@@ -1,18 +1,18 @@
 '''
     TODO:
-        * move dispatch table to labels? elsewhere?
-        * figure out DONE
+        * figure out a better way to resolve circular imports
 '''
 
-from reg import *
+from reg import fetch, assign, CONT
 from stack import clear_stack
 
-from labels import *
 from switch import switch
-
-from info import display_info
+from labels import DONE, EVAL_EXP
 
 INSTR = 'INSTR'
+
+# info.py imports INSTR
+from info import display_info
 
 def goto(label):
     assign(INSTR, label)

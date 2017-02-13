@@ -3,7 +3,7 @@
         * figure out persisting global env
 '''
 
-from reg import *
+from reg import fetch, assign, ENV, VAL, UNEV, ARGL
 from prim import primitives
 
 '''

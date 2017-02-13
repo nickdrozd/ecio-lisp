@@ -1,7 +1,7 @@
+from labels import *
+
 from evalExp import eval_exp
 from evalFuncs import *
-
-from labels import *
 
 switch = {
     EVAL_EXP : eval_exp,

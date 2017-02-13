@@ -6,7 +6,7 @@
 
 import operator
 
-from reg import *
+from reg import fetch, assign, FUNC, ARGL, VAL
 
 prim_add = '_+'
 prim_mul = '_*'

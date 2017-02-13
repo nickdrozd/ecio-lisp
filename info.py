@@ -1,13 +1,12 @@
 '''
     TODO:
         * move INFO flag to config register
+        * figure out import circularity with instr.py
 '''
-
-import json
 
 from reg import fetch, REGISTERS
 from stack import STACK
-import instr
+from instr import INSTR
 
 INFO = 1
 
@@ -35,8 +34,8 @@ def show_stack():
         print(' *', entry)
 
 def show_instr():
-    print(instr.INSTR)
-    print(fetch(instr.INSTR))
+    print(INSTR)
+    print(fetch(INSTR))
 
 def divider(char):
     print(char * 5)
