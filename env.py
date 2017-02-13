@@ -1,14 +1,13 @@
 '''
+    ENV is a list of dicts, ordered by scope
+
     TODO:
         * figure out persisting global env
 '''
 
 from reg import fetch, assign, ENV, VAL, UNEV, ARGL
-from prim import primitives
+from prim import PRIMITIVES
 
-'''
-ENV is a list of dicts, ordered by scope
-'''
 
 UNBOUND = 'UNBOUND'
 
@@ -18,7 +17,7 @@ def lookup(reg):
 
     var = fetch(reg)
 
-    if var in primitives:
+    if var in PRIMITIVES:
         return var
 
     env = fetch(ENV)
@@ -29,7 +28,7 @@ def lookup(reg):
 
     return UNBOUND
 
-def defineVar():
+def define_var():
     "bind the contents of UNEV to the contents of VAL in the newest frame"
     var, val, env = _get_var_val_env()
 
@@ -40,7 +39,7 @@ def defineVar():
 
     assign(ENV, env)
 
-def setVar():
+def set_var():
     var, val, env = _get_var_val_env()
 
     for frame in env:

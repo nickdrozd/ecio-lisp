@@ -51,7 +51,7 @@ def did_def_val():
     restore(CONT)
     restore(ENV)
     restore(UNEV)
-    defineVar()
+    define_var()
     instr.goto_continue()
 
 ###
@@ -60,8 +60,8 @@ def eval_if():
     save(ENV)
     save(CONT)
     save(EXPR)
-    _, ifTest, _, _ = fetch(EXPR)
-    assign(EXPR, ifTest)
+    _, condition, _, _ = fetch(EXPR)
+    assign(EXPR, condition)
     set_continue(IF_DECIDE)
     instr.goto_eval()
 
@@ -75,13 +75,13 @@ def if_decide():
         instr.goto(IF_ELSE)
 
 def if_then():
-    _, _, ifThen, _ = fetch(EXPR)
-    assign(EXPR, ifThen)
+    _, _, consequence, _ = fetch(EXPR)
+    assign(EXPR, consequence)
     instr.goto_eval()
 
 def if_else():
-    _, _, _, ifElse = fetch(EXPR)
-    assign(EXPR, ifElse)
+    _, _, _, alternative = fetch(EXPR)
+    assign(EXPR, alternative)
     instr.goto_eval()
 
 ###
