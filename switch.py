@@ -1,7 +1,7 @@
 from labels import *
 
-from evalExp import eval_exp
-from evalFuncs import *
+from eval_exp import eval_exp
+from ec_main import *
 
 switch = {
     EVAL_EXP : eval_exp,
