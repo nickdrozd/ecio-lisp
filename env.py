@@ -3,6 +3,8 @@
 
     TODO:
         * figure out persisting global env
+            * add memory section?
+                * naming? gensym?
 '''
 
 from reg import fetch, assign, ENV, VAL, UNEV, ARGL
@@ -66,6 +68,11 @@ def initial_env():
 
 def initialize_env():
     assign(ENV, initial_env())
+
+def set_global_env():
+    env = fetch(ENV)
+    base_frame = env[-1]
+    assign(ENV, [base_frame])    
 
 def _get_var_val_env():
     regs = UNEV, VAL, ENV
