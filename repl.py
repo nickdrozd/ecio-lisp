@@ -2,6 +2,7 @@ from reg import fetch, assign, EXPR, VAL
 from env import initialize_env
 from instr import run
 from parse import parse
+from stats import display_stats
 
 INTERPRETER_PROMPT = '<<< '
 INTERPRETER_EXIT = '.quit', '.exit'
@@ -13,7 +14,7 @@ def repl():
         try:
             get_expr()
             run()
-            print_result()
+            display_result()
         except KeyboardInterrupt:
             print()
             break
@@ -29,8 +30,12 @@ def get_expr():
     else:
         assign(EXPR, expr)
 
-def print_result():
+def display_result():
     print(fetch(VAL))
+    print()
+    display_stats()
+    print()
+
 
 if __name__ == '__main__':
     repl()
