@@ -9,11 +9,14 @@ from stack import clear_stack
 from switch import switch
 from labels import DONE, EVAL_EXP
 
+from stats import goto_stats
+
 INSTR = 'INSTR'
 
 # info.py imports INSTR
 from info import display_info
 
+@goto_stats
 def goto(label):
     assign(INSTR, label)
 
