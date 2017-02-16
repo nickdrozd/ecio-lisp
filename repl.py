@@ -11,7 +11,7 @@ EXIT_MESSAGE = 'Byeeeeeeee!'
 def repl():
     initialize_env()
     while True:
-        set_global_env()
+        # set_global_env()
         try:
             get_expr()
             run()

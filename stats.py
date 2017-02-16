@@ -1,3 +1,8 @@
+'''
+    TODO:
+        * add memory stats
+'''
+
 STATS = 1
 
 def display_stats():
