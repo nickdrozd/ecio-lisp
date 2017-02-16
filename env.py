@@ -8,9 +8,8 @@
     where a frame is a dictionary
 
     TODO:
-        * figure out persisting global env
-            * root pointer?
-        * figure out how to write to same address
+        * clean up mem imports
+            * consolidate read/write functions?
 '''
 
 from reg import fetch, assign, ENV, VAL, UNEV, ARGL
@@ -23,9 +22,10 @@ UNBOUND = 'UNBOUND'
 
 def read_env_from_memory():
     "read env from memory"
-    return read_from_address(fetch(ENV))
+    address = fetch(ENV)
+    return read_from_address(address), address
 
-def write_env_to_memory(env):
+def write_env_to_new_memory(env):
     "write env to memory at the earliest available address"
     address = write_to_free_address(env)
     assign(ENV, address)
@@ -37,33 +37,36 @@ def lookup(reg):
     if var in PRIMITIVES:
         return var
 
-    env = read_env_from_memory()
+    env, _ = read_env_from_memory()
 
     while env:
+        print(env)
         frame, enclosure = env
         if var in frame:
             return frame[var]
         else:
-            env = enclosure
+            env = read_from_address(enclosure)
 
     return UNBOUND
 
 def define_var():
     "bind var (in UNEV) to val (in VAL) in the most recent frame"
-    var, val, env = _get_var_val_env()
+    var, val = fetch(UNEV), fetch(VAL)
+    env, address = read_env_from_memory()
     frame, enclosure = env
     frame[var] = val
-    write_env_to_memory([frame, enclosure])
+    write_to_address([frame, enclosure], address)
 
 def set_var():
     "bind the most recent occurence of var (in UNEV) to val (in VAL)"
-    var, val, env = _get_var_val_env()
+    var, val = fetch(UNEV), fetch(VAL)
+    env, address = read_env_from_memory()
 
     while env:
         frame, enclosure = env
         if var in frame:
             frame[var] = val
-            write_env_to_memory([frame, enclosure])
+            write_to_address([frame, enclosure], address)
         else:
             env = enclosure
 
@@ -78,7 +81,7 @@ def extend_env():
 
     ext_env = [new_frame, env_pointer]
 
-    write_env_to_memory(ext_env)
+    write_env_to_new_memory(ext_env)
 
 # initialization
 
@@ -86,18 +89,7 @@ def initial_env():
     return [{}, None]
 
 def initialize_env():
-    env = initial_env()
-    write_env_to_memory(env)
+    write_to_address(initial_env(), ROOT)
 
-def set_global_env():
-    env = fetch(ENV)
-    base_frame = env[-1]
-    assign(ENV, [base_frame])
-
-# helpers
-
-def _get_var_val_env():
-    var = fetch(UNEV)
-    val = fetch(VAL)
-    env = read_env_from_memory()
-    return var, val, env
+def load_global_env():
+    assign(ENV, ROOT)

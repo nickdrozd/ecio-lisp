@@ -1,5 +1,5 @@
 from reg import fetch, assign, EXPR, VAL
-from env import initialize_env, set_global_env
+from env import initialize_env, load_global_env
 from instr import run
 from parse import parse
 from stats import display_stats
@@ -11,7 +11,7 @@ EXIT_MESSAGE = 'Byeeeeeeee!'
 def repl():
     initialize_env()
     while True:
-        # set_global_env()
+        load_global_env()
         try:
             get_expr()
             run()

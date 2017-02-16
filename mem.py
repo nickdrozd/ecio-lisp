@@ -4,8 +4,6 @@
     registers are distinct.
 
     TODO:
-        * figure out how to write to same address
-        * root pointer for global env
         * garbage collection!
             * mark-sweep
             * stop-copy
@@ -16,6 +14,8 @@ from reg import fetch, assign
 MEM = 'MEM'
 
 PREFIX = 'MEM_'
+
+ROOT = PREFIX + '0'
 
 def read_from_address(address):
     memory = fetch(MEM)
