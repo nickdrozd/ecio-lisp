@@ -32,7 +32,11 @@ def eval_lambda():
     _, params, *body = fetch(EXPR)
     assign(UNEV, params)
     assign(EXPR, body)
-    assign(VAL, [fetch(UNEV), fetch(EXPR), fetch(ENV)])
+    assign(VAL, [
+        fetch(ENV),
+        fetch(UNEV),
+        fetch(EXPR),
+    ])
     instr.goto_continue()
 
 ###
@@ -176,7 +180,7 @@ def apply_primitive():
 
 def apply_compound():
     # this needs to agree with eval_lambda
-    params, body, env = fetch(FUNC)
+    env, params, body = fetch(FUNC)
 
     assign(UNEV, params)
     assign(ENV, env)
