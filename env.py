@@ -45,7 +45,7 @@ def lookup(reg):
         if var in frame:
             return frame[var]
         else:
-            env = read_from_address(enclosure)
+            env = read_from_address(enclosure) if enclosure else None
 
     return UNBOUND
 
