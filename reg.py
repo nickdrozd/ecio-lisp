@@ -18,7 +18,7 @@ def fetch(reg):
 
 def assign(reg, val):
     with open(reg, 'w') as regf:
-        regf.write(json.dumps(val))
+        regf.write(json.dumps(val, sort_keys=True, indent=4))
 
 def clear_register(reg):
     with open(reg, 'w'):
