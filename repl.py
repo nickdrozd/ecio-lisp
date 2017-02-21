@@ -1,8 +1,15 @@
+'''
+    TODO:
+        * syntax checking (paren count, etc)
+            * in parse or in get_expr?
+'''
+
 from reg import fetch, assign, EXPR, VAL
 from env import initialize_env, load_global_env
 from instr import run
 from parse import parse
 from stats import display_stats
+from mem import collect_garbage_if_needed
 
 INTERPRETER_PROMPT = '<<< '
 INTERPRETER_EXIT = '.quit', '.exit'
@@ -12,6 +19,7 @@ def repl():
     initialize_env()
     while True:
         load_global_env()
+        collect_garbage_if_needed()
         try:
             get_expr()
             run()
@@ -21,7 +29,6 @@ def repl():
             break
         # except Exception as e: # better way to do this?
         #   print(e)
-        #   break
 
 def get_expr():
     expr = parse(input(INTERPRETER_PROMPT))

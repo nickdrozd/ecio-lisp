@@ -14,7 +14,7 @@
 
 from reg import fetch, assign, ENV, VAL, UNEV, ARGL
 from prim import PRIMITIVES
-from mem import *
+from mem import ROOT, read_from_address, write_to_address, write_to_free_address
 
 
 UNBOUND = 'UNBOUND'
@@ -40,7 +40,6 @@ def lookup(reg):
     env, _ = read_env_from_memory()
 
     while env:
-        print(env)
         frame, enclosure = env
         if var in frame:
             return frame[var]
