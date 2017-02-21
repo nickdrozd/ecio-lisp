@@ -1,9 +1,10 @@
 '''
     TODO:
         * add memory stats
+            * gc stats
 '''
 
-STATS = 1
+STATS = 0
 
 def display_stats():
     if STATS:

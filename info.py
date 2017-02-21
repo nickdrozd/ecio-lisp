@@ -1,6 +1,9 @@
 '''
+    The INFO flag doesn't need to be in a 'config' register
+    because it's a client option -- it doesn't have anything
+    to do with the computation itself.
+
     TODO:
-        * move INFO flag to config register
         * figure out import circularity with instr.py
 '''
 
@@ -8,7 +11,7 @@ from reg import fetch, REGISTERS
 from stack import STACK
 from instr import INSTR
 
-INFO = 1
+INFO = 0
 
 def display_info():
     if INFO:
