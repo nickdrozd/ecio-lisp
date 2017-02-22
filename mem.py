@@ -72,7 +72,7 @@ def convert_str_address(str_address):
 def collect_garbage_if_needed():
     free_address = next_free_address(fetch(MEM))
     if convert_str_address(free_address) >= MEM_LEN:
-        print('Collecting gargage...')        
+        print('Collecting gargage...')
         collect_garbage()
 
 BROKEN_HEART = '</3'
@@ -80,9 +80,45 @@ BROKEN_HEART = '</3'
 # stop and copy
 def collect_garbage():
     from_space = fetch(MEM)
-    to_space = {}
-    
-    reachable_addresses = [ROOT]
+
+    reachable_addresses = get_reachable_addresses(from_space, ROOT)
+
+    forwarding = {
+        old: convert_num_address(i)
+        for i, old in enumerate(reachable_addresses)
+    }
+
+    to_space = {
+        forwarding[address]:
+            update_env_pointers(
+                from_space[address], forwarding)
+        for address in reachable_addresses
+    }
+
+    assign(MEM, to_space)
+
+
+def update_env_pointers(old_env, forwarding):
+    old_frame, old_enclosure = old_env
+
+    new_frame = {
+        key: (val if not is_function(val)
+              else [forwarding[val[0]]] + val[1:])
+        for key, val in old_frame.items()
+    }
+
+    new_enclosure = (forwarding[old_enclosure]
+        if old_enclosure is not None else None)
+
+    new_env = [new_frame, new_enclosure]
+
+    return new_env
+
+
+# Would this be easier or harder to understand
+# if this was written recursively? (TODO)
+def get_reachable_addresses(from_space, root):
+    reachable_addresses = [root]
 
     for address in reachable_addresses:
         env = from_space[address]
@@ -91,36 +127,7 @@ def collect_garbage():
             if pointer not in reachable_addresses:
                 reachable_addresses.append(pointer)
 
-    forwarding = {
-        old: convert_num_address(i)
-        for i, old in enumerate(reachable_addresses)
-    }
-
-    def update_env(old_env):
-        old_frame, old_enclosure = old_env
-
-        new_frame = {
-            key: (val if not is_function(val)
-                  else [forwarding[val[0]]] + val[1:])
-            for key, val in old_frame.items()
-        }
-
-        new_enclosure = (forwarding[old_enclosure]
-            if old_enclosure is not None else None)
-
-        new_env = [new_frame, new_enclosure]
-
-        return new_env        
-
-    for old_address in reachable_addresses:
-        old_env = from_space[old_address]
-
-        new_env = update_env(old_env)
-        new_address = forwarding[old_address]
-
-        to_space[new_address] = new_env
-
-    assign(MEM, to_space)
+    return reachable_addresses
 
 
 def gather_pointers(env):
@@ -135,6 +142,7 @@ def gather_pointers(env):
         addresses.add(enclosure)
 
     return addresses
+
 
 def is_function(entry):
     try:
