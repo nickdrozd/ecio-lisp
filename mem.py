@@ -8,6 +8,7 @@
             * mark-sweep
             * Xstop-copyX
         * figure out a better gc trigger
+            * memory limit?
 '''
 
 from reg import fetch, assign
@@ -78,93 +79,61 @@ BROKEN_HEART = '</3'
 
 # stop and copy
 def collect_garbage():
-    FROM_SPACE = fetch(MEM)
-    TO_SPACE = {}
-    moved_addresses = []
+    from_space = fetch(MEM)
+    to_space = {}
+    
+    reachable_addresses = [ROOT]
 
-    def move_to_new_memory(from_address):
-        print('moving {}'.format(from_address))
-        env = FROM_SPACE[from_address]
-
-        frame, enclosure = env
-        if frame is BROKEN_HEART:
-            return enclosure  # enclosure is forwarding address
-
-        to_address = next_free_address(TO_SPACE)
-        TO_SPACE[to_address] = env
-        # post forwarding address
-        FROM_SPACE[from_address] = [BROKEN_HEART, to_address]
-        moved_addresses.append(to_address)
-        return to_address
-
-    # move root
-    move_to_new_memory(ROOT)
-
-    # iterate over new addresses
-    # (this list will expand as references get copied over!)
-    # for address in TO_SPACE:
-    for address in moved_addresses:
-
-    # in the worst/best case, nothing in from_space is garbage,
-    # so to_space will be no longer than from_space
-    # for i in range(len(FROM_SPACE)):
-    #     address = convert_num_address(i)
-    #     if address not in TO_SPACE:
-    #         break
-
-
-        print('updating address:', address)
-        env = TO_SPACE[address]
-
-        # gather all pointers
-        old_addresses = [pointer for pointer in gather_pointers(env)]
-        print('old_addresses:', old_addresses)
-        # move over everything pointed to, gathering new pointers
-        new_addresses = [
-            move_to_new_memory(old_address)  # side effects!
-            for old_address in old_addresses
-        ]
-        print('new_addresses:', new_addresses)
-        # update all pointers
-        updated_env = update_env(env, old_addresses, new_addresses)
-
-        # overwrite copied env with updated env
-        TO_SPACE[address] = updated_env
-    print('to_space:', TO_SPACE)
-    assign(MEM, TO_SPACE)
-
-
-def update_env(env, old_addresses, new_addresses):
-    old_frame, old_enclosure = env
-    print('env:', old_frame, old_enclosure)
+    for address in reachable_addresses:
+        env = from_space[address]
+        pointers = gather_pointers(env)
+        for pointer in pointers:
+            if pointer not in reachable_addresses:
+                reachable_addresses.append(pointer)
 
     forwarding = {
-        old: new for old, new in
-        zip(old_addresses, new_addresses)
+        old: convert_num_address(i)
+        for i, old in enumerate(reachable_addresses)
     }
 
-    if forwarding == {}:
-        return env
+    def update_env(old_env):
+        old_frame, old_enclosure = old_env
 
-    forwarding[None] = None
+        new_frame = {
+            key: (val if not is_function(val)
+                  else [forwarding[val[0]]] + val[1:])
+            for key, val in old_frame.items()
+        }
 
-    print('forwarding:', forwarding)
+        new_enclosure = (forwarding[old_enclosure]
+            if old_enclosure is not None else None)
 
-    updated_frame = {
-        key: (val if not is_function(val)
-              else [forwarding[val[0]]] + [val[1:]])
-        for key, val in old_frame.items()
-    }
+        new_env = [new_frame, new_enclosure]
 
-    updated_enclosure = forwarding[old_enclosure]
+        return new_env        
 
-    return [updated_frame, updated_enclosure]
+    for old_address in reachable_addresses:
+        old_env = from_space[old_address]
+
+        new_env = update_env(old_env)
+        new_address = forwarding[old_address]
+
+        to_space[new_address] = new_env
+
+    assign(MEM, to_space)
+
 
 def gather_pointers(env):
-    frame, _ = env
+    frame, enclosure = env
+
     functions = [val for val in frame.values() if is_function(val)]
+
     # functions have the form [address, params, body]
-    addresses = [address for address, _, _ in functions]
+    addresses = set([address for address, _, _ in functions])
+
+    if enclosure is not None:
+        addresses.add(enclosure)
+
     return addresses
 
 def is_function(entry):
