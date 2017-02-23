@@ -1,353 +1,218 @@
 import unittest
-import json
 
-from reg import *
-from stack import *
-from instr import *
-from env import *
+from garbage import collect_garbage
+from mem import load_memory, write_memory, ROOT
 
-from parse import parse
-
-
-class RegFileTests(unittest.TestCase):
-    # def __init__(self, *args, **kwargs):
-    #   super().__init__(*args, **kwargs)
-    #   self.verbose = 1
-
-    def setUp(self):
-        self.display()
-
-    def tearDown(self):
-        self.display()
-
-    # assertsions #
-
-    def assert_before_func_after(self, before, func, after):
-        '''
-        before and after are dicts, func a function
-        '''
-        self.set_up_registers(before)
-        func()
-        self.verify_outcome(after)
-
-    def set_up_registers(self, setup):
-        for reg in setup:
-            self.assign_and_verify(reg, setup[reg])
-
-    def verify_outcome(self, expected):
-        for reg in expected:
-            self.assert_reg_contents(reg, expected[reg])
-
-    def assign_and_verify(self, reg, contents):
-        msg = 'assigning {} to {}...'
-        self.display(msg.format(contents, reg))
-        assign(reg, contents)
-        self.assert_reg_contents(reg, contents)
-
-    def assert_reg_contents(self, reg, expected):
-        contents = fetch(reg)
-        self.display_expected_actual(reg, expected, contents)
-        self.assertEqual(contents, expected)
-
-    # utilities #
-
-    def display_expected_actual(self, reg, expected, actual):
-        msg = '{} -- expected: {} -- actual: {}'
-        self.display(msg.format(reg, expected, actual))
-
-    def display(self, msg=''):
-        if self.verbose:
-            print(msg)
-
-
-class RunTests(RegFileTests):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.verbose = 1
-
-    def setUp(self):
-        super().setUp()
-        initial_env()
-        initialize()
-
-
-    # def test_define(self):
-
-
-
-
-
-
-    def test_if(self):
-        conds = {
-            '(if 3 4 5)' : 4,
-            '(if 0 4 5)' : 5,
-        }
-
-        for code, result in conds.items():
-            self.assert_run_before_after(
-                {EXPR : parse(code)},
-                {VAL : result})
-
-
-    def test_num(self):
-        numbers = 0, 5, 1000000
-
-        for num in numbers:
-            self.assert_run_before_after(
-                {EXPR : num},
-                {VAL : num})
-
-
-    def test_quote(self):
-        quotes = map(parse, (
-            '(quote (mauve taupe sepia))',
-            '(quote (1 2 3))',
-            '(quote ())',
-            '(quote quote)',
-            '(quote (quote (quote teal))))',
-        ))
-
-        for quote in quotes:
-            _, text = quote
-            self.assert_run_before_after(
-                {EXPR : quote},
-                {VAL : text})
-
-
-    def assert_run_before_after(self, before, after):
-        self.assert_before_func_after(before, run, after)
-
-
-class UnitTests(RegFileTests):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.verbose = 0
-
-    # environment operations #
-
-    def test_lookup(self):
-        env = [
-            {'ragdoll': 4},
-            {'sphynx': 5},
-        ]
-
-        pairs = (
-            ('ragdoll', 4),
-            ('sphynx', 5),
-            ('siamese', UNBOUND))
-
-        self.assign_and_verify(ENV, env)
-
-        lookup_reg = EXPR
-        for var, val in pairs:
-            self.assign_and_verify(lookup_reg, var)
-            self.display('looking up {}...'.format(lookup_reg))
-            lookup_val = lookup(lookup_reg)
-            self.display_expected_actual(
-                'lookup({})'.format(lookup_reg), val, lookup_val)
-            self.assertEqual(val, lookup_val)
-
-
-    def test_define_var(self):
-        initial_env = [
-            {'trout': 4},
-            {'cod': 5},
-        ]
-
-        var, val = 'halibut', 6
-
-        expected_env = [
-            {'trout': 4, 'halibut': 6},
-            {'cod': 5},
-        ]
-
-        before = {
-            ENV : initial_env,
-            VAL : val,
-            UNEV : var
-        }
-
-        func = defineVar
-
-        after = {
-            ENV : expected_env
-        }
-
-        self.assert_before_func_after(before, func, after)
-
-
-    # basic register tests #
-
-    def test_reg(self):
-        '''
-        1) Assign several words to EXPR.
-
-        2) Assign distinct contents to VAL and CONT,
-        then assign CONT to VAL.
-        '''
-        for animal in 'wren', 'jay', 'finch':
-            self.assign_and_verify(EXPR, animal)
-
-        self.display()
-
-        val, cont = 'lark', 'thrush'
-
-        self.set_up_registers({
-            VAL : val,
-            CONT : cont
+class TestGarbageCollector(unittest.TestCase):
+    def test_gc(self):
+        write_memory({
+            "__MEM_0": [
+                {
+                    "add12": [
+                        "__MEM_12",
+                        [
+                            "x"
+                        ],
+                        [
+                            [
+                                "_+",
+                                "x",
+                                [
+                                    "_+",
+                                    "a",
+                                    [
+                                        "_+",
+                                        "b",
+                                        "c"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    "add9": [
+                        "__MEM_5",
+                        [
+                            "x"
+                        ],
+                        [
+                            [
+                                "_+",
+                                "x",
+                                [
+                                    "_+",
+                                    "a",
+                                    [
+                                        "_+",
+                                        "b",
+                                        "c"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    "addabc": [
+                        "__MEM_0",
+                        [
+                            "a"
+                        ],
+                        [
+                            [
+                                "\u03bb",
+                                [
+                                    "b"
+                                ],
+                                [
+                                    "\u03bb",
+                                    [
+                                        "c"
+                                    ],
+                                    [
+                                        "\u03bb",
+                                        [
+                                            "x"
+                                        ],
+                                        [
+                                            "_+",
+                                            "x",
+                                            [
+                                                "_+",
+                                                "a",
+                                                [
+                                                    "_+",
+                                                    "b",
+                                                    "c"
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    "f": [
+                        "__MEM_0",
+                        [],
+                        [
+                            [
+                                "\u03bb",
+                                [],
+                                8
+                            ]
+                        ]
+                    ],
+                    "variable": "value",
+                },
+                None
+            ],
+            "__MEM_1": [
+                {},
+                "__MEM_0"
+            ],
+            "__MEM_10": [
+                {
+                    "a": 3
+                },
+                "__MEM_0"
+            ],
+            "__MEM_11": [
+                {
+                    "b": 4
+                },
+                "__MEM_10"
+            ],
+            "__MEM_12": [
+                {
+                    "c": 5
+                },
+                "__MEM_11"
+            ],
+            "__MEM_13": [
+                {},
+                "__MEM_0"
+            ],
+            "__MEM_14": [
+                {},
+                "__MEM_13"
+            ],
+            "__MEM_2": [
+                {},
+                "__MEM_1"
+            ],
+            "__MEM_3": [
+                {
+                    "a": 2
+                },
+                "__MEM_0"
+            ],
+            "__MEM_4": [
+                {
+                    "b": 3
+                },
+                "__MEM_3"
+            ],
+            "__MEM_5": [
+                {
+                    "c": 4
+                },
+                "__MEM_4"
+            ],
+            "__MEM_6": [
+                {
+                    "x": 8
+                },
+                "__MEM_5"
+            ],
+            "__MEM_7": [
+                {},
+                "__MEM_0"
+            ],
+            "__MEM_8": [
+                {},
+                "__MEM_7"
+            ],
+            "__MEM_9": [
+                {
+                    "x": 8
+                },
+                "__MEM_5"
+            ]
         })
 
-        assign(VAL, fetch(CONT))
+        collect_garbage()
 
-        self.verify_outcome({
-            VAL : cont,
-            CONT : cont
-        })
+        self.load_memory()
 
-        code = parse('(warbler bulbul titmouse)')
-
-        self.assign_and_verify(FUNC, code)
+        self.assert_null_root_enclosure()
+        self.assert_address_count(7)
+        self.assert_root_definition_count(5)
 
 
-    def test_stack(self):
-        '''
-        Assign to VAL and CONT, save from both,
-        then assign back to them in reverse order.
-        '''
-        val, cont = 'schipperke', 'pomeranian'
+    def assert_address_count(self, expected):
+        actual_address_count = len(self.memory.keys())
 
-        self.set_up_registers({
-            VAL : val,
-            CONT : cont
-        })
+        self.assertEqual(
+            actual_address_count,
+            expected,
+            'Address count -- expected: {}, actual: {}'.format(
+                expected, actual_address_count))
 
-        self.assert_empty_stack()
+    def assert_root_definition_count(self, expected):
+        root_frame, _ = self.memory[ROOT]
+        actual_definition_count = len(root_frame.keys())
 
-        self.save_and_verify_pairs(
-            (VAL, val),
-            (CONT, cont))
+        self.assertEqual(
+            actual_definition_count,
+            expected,
+            'Root definition count -- expected: {}, actual: {}'.format(
+                expected, actual_definition_count))
 
-        self.assert_stack_depth(2)
+    def assert_null_root_enclosure(self):
+        _, enclosure = self.memory[ROOT]
 
-        self.restore_and_verify_pairs(
-            (VAL, cont),
-            (CONT, val))
+        self.assertIsNone(
+            enclosure,
+            'Root enclosure -- expected: {}, actual: {}'.format(
+                None, enclosure))
 
-        self.assert_empty_stack()
-
-        # save and restore lists
-
-        self.display()
-
-        code = parse('(yorkie scottie jack russell)')
-
-        self.assign_and_verify(ARGL, code)
-        self.save_and_verify(ARGL, code)
-        self.restore_and_verify(UNEV, code)
-
-
-    def test_goto(self):
-        self.goto_and_verify('quince')
-        self.goto_continue_and_verify('fig')
-        self.goto_eval_and_verify()
-
-
-    def test_initialize(self):
-        clear_registers()
-        clear_stack()
-
-        for reg in REGISTERS + (STACK,):
-            with open(reg, 'r') as regf:
-                self.assertEqual(regf.read(), '')
-
-    # assertions #
-
-    def goto_eval_and_verify(self):
-        goto_eval()
-        self.assert_reg_contents(INSTR, EVAL_EXP)
-
-    def goto_continue_and_verify(self, label):
-        self.set_continue_and_verify(label)
-        goto_continue()
-        self.assert_reg_contents(INSTR, label)
-
-    def set_continue_and_verify(self, label):
-        set_continue(label)
-        self.assert_reg_contents(CONT, label)
-
-    def goto_and_verify(self, label):
-        goto(label)
-        self.assert_reg_contents(INSTR, label)
-
-    def save_and_verify_pairs(self, *pairs):
-        for reg, expected in pairs:
-            self.save_and_verify(reg, expected)
-
-    def save_and_verify(self, reg, expected):
-        self.display('saving from {}...'.format(reg))
-        depth = self.get_stack_depth()
-        save(reg)
-        self.show_stack()
-        self.assert_stack_depth(depth + 1)
-        self.assert_stack_top(expected)
-        self.assert_reg_contents(reg, expected)
-
-    def restore_and_verify_pairs(self, *pairs):
-        for reg, expected in pairs:
-            self.restore_and_verify(reg, expected)
-
-    def restore_and_verify(self, reg, expected):
-        self.display('restoring to {}...'.format(reg))
-        depth = self.get_stack_depth()
-        restore(reg)
-        self.show_stack()
-        self.assert_stack_depth(depth - 1)
-        self.assert_reg_contents(reg, expected)
-
-    def assert_stack_depth(self, expected):
-        depth = self.get_stack_depth()
-        self.display_expected_actual(
-            'STACK DEPTH', expected, depth)
-        self.assertEqual(expected, depth)
-
-    def assert_stack_top(self, expected):
-        top = self.get_stack_top()
-        self.display_expected_actual(
-            'STACK TOP', expected, top)
-        self.assertEqual(top, expected)
-
-    def assert_empty_stack(self):
-        with open(STACK, 'r') as stack:
-            self.assertEqual(stack.read(), '')
-
-    def assign_and_verify_pairs(self, *pairs):
-        for reg, contents in pairs:
-            self.assign_and_verify(reg, contents)
-
-    def assert_reg_contents_pairs(self, *pairs):
-        for reg, expected in pairs:
-            self.assert_reg_contents(reg, expected)
-
-    # utilities #
-
-    def get_stack_depth(self):
-        with open(STACK, 'r') as stack:
-            return len(stack.readlines())
-
-    def get_stack_top(self):
-        with open(STACK, 'r') as stack:
-            contents = stack.readlines()
-
-        self.assertNotEqual(contents, '')
-        *tail, head = contents
-        return json.loads(head)
-
-    def show_stack(self):
-        with open(STACK, 'r') as stack:
-            stack_contents = stack.read().split('\n')
-            self.display('STACK: ' + str(stack_contents))
-
-
-if __name__ == '__main__':
-    unittest.main()
+    def load_memory(self):
+        self.memory = load_memory()
