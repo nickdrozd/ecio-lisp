@@ -9,7 +9,7 @@ from env import initialize_env, load_global_env
 from instr import run
 from parse import parse
 from stats import display_stats
-from mem import collect_garbage_if_needed
+from garbage import collect_garbage_if_needed
 
 INTERPRETER_PROMPT = '<<< '
 INTERPRETER_EXIT = '.quit', '.exit'
