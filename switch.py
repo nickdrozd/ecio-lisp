@@ -17,6 +17,9 @@ switch = {
     EVAL_DEF : eval_def,
     DID_DEF_VAL : did_def_val,
 
+    EVAL_ASS : eval_ass,
+    DID_ASS_VAL : did_ass_val,
+
     EVAL_IF : eval_if,
     IF_DECIDE : if_decide,
     IF_THEN : if_then,

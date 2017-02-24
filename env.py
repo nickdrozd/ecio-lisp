@@ -59,15 +59,19 @@ def define_var():
 def set_var():
     "bind the most recent occurence of var (in UNEV) to val (in VAL)"
     var, val = fetch(UNEV), fetch(VAL)
+
     env, address = read_env_from_memory()
 
     while env:
         frame, enclosure = env
         if var in frame:
-            frame[var] = val
-            write_to_address([frame, enclosure], address)
+            frame[var] = val  # side effect!
+            write_to_address(env, address)
+            return
         else:
-            env = enclosure
+            env, address = read_from_address(enclosure)
+
+
 
     # raise exception? return dummy val?
 

@@ -22,7 +22,7 @@ def get_eval_label(expr):
 
     keyword_groups = {
         DEFINE_KEYS : EVAL_DEF,
-        # ASS_KEYS : EVAL_ASS,
+        ASS_KEYS : EVAL_ASS,
         LAMBDA_KEYS : EVAL_LAMBDA,
         IF_KEYS : EVAL_IF,
         BEGIN_KEYS : EVAL_BEGIN,

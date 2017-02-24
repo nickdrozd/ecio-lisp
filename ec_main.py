@@ -60,6 +60,25 @@ def did_def_val():
 
 ###
 
+def eval_ass():
+    _, var, val = fetch(EXPR)
+    assign(UNEV, var)
+    assign(EXPR, val)
+    save(UNEV)
+    save(ENV)
+    save(CONT)
+    set_continue(DID_ASS_VAL)
+    instr.goto_eval()
+
+def did_ass_val():
+    restore(CONT)
+    restore(ENV)
+    restore(UNEV)
+    set_var()
+    instr.goto_continue()
+
+###
+
 def eval_if():
     save(ENV)
     save(CONT)
