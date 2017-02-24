@@ -30,6 +30,8 @@ switch = {
     ACC_ARG : acc_arg,
     DID_LAST_ARG : did_last_arg,
 
+    EVAL_BEGIN : eval_begin,
+
     APPLY_FUNC : apply_func,
 
     APPLY_PRIMITIVE : apply_primitive,

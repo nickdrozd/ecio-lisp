@@ -25,7 +25,7 @@ def get_eval_label(expr):
         # ASS_KEYS : EVAL_ASS,
         LAMBDA_KEYS : EVAL_LAMBDA,
         IF_KEYS : EVAL_IF,
-        # BEGIN_KEYS : EVAL_BEGIN,
+        BEGIN_KEYS : EVAL_BEGIN,
         QUOTE_KEYS : EVAL_QUOTE
     }
 

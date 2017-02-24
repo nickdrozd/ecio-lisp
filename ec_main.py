@@ -90,6 +90,14 @@ def if_else():
 
 ###
 
+def eval_begin():
+    _, *body = fetch(EXPR)
+    assign(UNEV, body)
+    save(CONT)
+    instr.goto(EVAL_SEQ)
+
+###
+
 def eval_func():
     save(CONT)
     save(ENV)
