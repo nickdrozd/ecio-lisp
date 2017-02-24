@@ -13,11 +13,19 @@ PRIM_MUL = '_*'
 PRIM_SUB = '_-'
 PRIM_DIV = '_/'
 
+PRIM_EQ = '='
+PRIM_LT = '<'
+PRIM_GT = '>'
+
 PRIMITIVES = {
     PRIM_ADD : operator.add,
     PRIM_MUL : operator.mul,
     PRIM_SUB : operator.sub,
     PRIM_DIV : operator.floordiv,
+
+    PRIM_EQ : operator.eq,
+    PRIM_LT : operator.lt,
+    PRIM_GT : operator.gt,
 }
 
 def is_primitive_func():
