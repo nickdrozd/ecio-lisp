@@ -18,8 +18,8 @@ EXIT_MESSAGE = 'Byeeeeeeee!'
 def repl():
     initialize_env()
     while True:
-        load_global_env()
         collect_garbage_if_needed()
+        load_global_env()
         try:
             get_expr()
             run()
