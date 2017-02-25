@@ -1,9 +1,72 @@
 import unittest
 
-from garbage import collect_garbage
-from mem import load_memory, write_memory, ROOT
+from reg import fetch, assign, EXPR, VAL, clear_registers
+from stack import clear_stack
+from parse import parse
+from instr import run
+from env import initialize_env, load_global_env
 
-class TestGarbageCollector(unittest.TestCase):
+from garbage import collect_garbage
+from mem import load_memory, write_memory, clear_memory, ROOT
+
+
+class EcioTestCase(unittest.TestCase):
+    def setUp(self):
+        clear_registers()
+        clear_stack()
+        clear_memory()
+        initialize_env()
+
+class TestRun(EcioTestCase):
+    '''Evaluates an expression using all basic language features
+
+    The expression includes a tree-recursive fibonacci function,
+    so it runs pretty slow. Be patient!
+    '''
+    def test_run(self):
+        expr = '''
+            (begin
+                (def x 2)
+                (def y 3)
+                (def z 4)
+                (set! z (_+ z (_+ x y)))
+                (def fibonacci
+                    (λ (n)
+                        (if (< n 2)
+                            n
+                            (_+ (fibonacci (_- n 1))
+                                (fibonacci (_- n 2))))))
+                (def fibz (fibonacci z))
+                (set! x
+                    (_* ((λ (x) (_* x x)) 3)
+                        fibz))
+                (def addabc
+                    (λ (a)
+                        (λ (b)
+                            (λ (c)
+                                (λ (x)
+                                    (_+ x (_+ a (_+ b c))))))))
+                (def d8 (λ () 8))
+                (def result ((((addabc x) fibz) z) (d8)))
+                result)
+        '''
+        # z = 9
+        # fibz = 34
+        # x = 306
+        # result = 357
+
+        assign(EXPR, parse(expr))
+        run()
+        val = fetch(VAL)
+
+        self.assertEqual(val, 357)
+
+
+
+
+
+
+class TestGarbageCollector(EcioTestCase):
     def test_gc(self):
         write_memory({
             "__MEM_0": [
