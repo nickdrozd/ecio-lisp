@@ -3,11 +3,14 @@
         * figure out a better way to resolve circular imports
 '''
 
-from reg import fetch, assign, CONT
+from reg import fetch, assign, CONT # clear_registers?
 from stack import clear_stack
 
 from switch import switch
 from labels import DONE, EVAL_EXP
+
+from env import load_global_env
+from garbage import collect_garbage_if_needed
 
 from stats import goto_stats
 
@@ -30,7 +33,12 @@ def initialize_cont():
     assign(CONT, DONE)
 
 def initialize():
+    # by the time run gets called in the repl,
+    # EXPR has already been set, so we can't
+    # call clear_registers
     clear_stack()
+    collect_garbage_if_needed()
+    load_global_env()
     initialize_cont()
     goto_eval()
 

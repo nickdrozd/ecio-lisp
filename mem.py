@@ -35,6 +35,9 @@ def write_to_free_address(data):
     write_to_address(data, address)
     return address
 
+def clear_memory():
+    write_memory({})
+
 # this is a little dramatic
 def next_free_address(memory_space):
     used_addresses = [

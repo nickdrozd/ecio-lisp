@@ -10,6 +10,8 @@ CONT = 'CONT'
 
 REGISTERS = EXPR, VAL, ENV, UNEV, FUNC, ARGL, CONT
 
+EMPTY_REG = '"***"'
+
 # basic register operations
 
 def fetch(reg):
@@ -21,8 +23,8 @@ def assign(reg, val):
         regf.write(json.dumps(val, sort_keys=True, indent=4))
 
 def clear_register(reg):
-    with open(reg, 'w'):
-        pass
+    with open(reg, 'w') as regf:
+        regf.write(EMPTY_REG)
 
 def clear_registers():
     for reg in REGISTERS:
