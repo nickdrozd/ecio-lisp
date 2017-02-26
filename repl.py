@@ -28,19 +28,25 @@ def repl():
         #   print(e)
 
 def get_expr():
-    expr = parse(input(INTERPRETER_PROMPT))
+    expr = input(INTERPRETER_PROMPT)
 
     if expr in INTERPRETER_EXIT:
         raise Exception(EXIT_MESSAGE)
     else:
-        assign(EXPR, expr)
+        parse_and_set_expr(expr)
 
 def display_result():
-    print(fetch(VAL))
+    print(get_result())
     print()
     display_stats()
     print()
 
+def parse_and_set_expr(lisp_expr):
+    parsed = parse(lisp_expr)
+    assign(EXPR, parsed)
+
+def get_result():
+    return fetch(VAL)
 
 if __name__ == '__main__':
     repl()

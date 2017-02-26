@@ -1,10 +1,10 @@
 import unittest
 
-from reg import fetch, assign, EXPR, VAL, clear_registers
+from reg import clear_registers
 from stack import clear_stack
-from parse import parse
+from repl import parse_and_set_expr, get_result
 from instr import run
-from env import initialize_env, load_global_env
+from env import initialize_env
 
 from garbage import collect_garbage
 from mem import load_memory, write_memory, clear_memory, ROOT
@@ -16,6 +16,7 @@ class EcioTestCase(unittest.TestCase):
         clear_stack()
         clear_memory()
         initialize_env()
+
 
 class TestRun(EcioTestCase):
     '''Evaluates an expression using all basic language features
@@ -55,15 +56,12 @@ class TestRun(EcioTestCase):
         # x = 306
         # result = 357
 
-        assign(EXPR, parse(expr))
+        # test some repl functions too!
+        parse_and_set_expr(expr)
         run()
-        val = fetch(VAL)
+        val = get_result()
 
         self.assertEqual(val, 357)
-
-
-
-
 
 
 class TestGarbageCollector(EcioTestCase):
