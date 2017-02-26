@@ -48,7 +48,7 @@ def eval_def():
     save(UNEV)
     save(ENV)
     save(CONT)
-    set_continue(DID_DEF_VAL)
+    instr.set_continue(DID_DEF_VAL)
     instr.goto_eval()
 
 def did_def_val():
@@ -67,7 +67,7 @@ def eval_ass():
     save(UNEV)
     save(ENV)
     save(CONT)
-    set_continue(DID_ASS_VAL)
+    instr.set_continue(DID_ASS_VAL)
     instr.goto_eval()
 
 def did_ass_val():
@@ -85,7 +85,7 @@ def eval_if():
     save(EXPR)
     _, condition, _, _ = fetch(EXPR)
     assign(EXPR, condition)
-    set_continue(IF_DECIDE)
+    instr.set_continue(IF_DECIDE)
     instr.goto_eval()
 
 def if_decide():
@@ -127,7 +127,7 @@ def eval_func():
 
     save(UNEV)
 
-    set_continue(DID_FUNC)
+    instr.set_continue(DID_FUNC)
     instr.goto_eval()
 
 def did_func():
@@ -165,7 +165,7 @@ def arg_loop():
     save(ENV)
     save(UNEV)
 
-    set_continue(ACC_ARG)
+    instr.set_continue(ACC_ARG)
     instr.goto_eval()
 
 def acc_arg():
@@ -178,7 +178,7 @@ def acc_arg():
     instr.goto(ARG_LOOP)
 
 def last_arg():
-    set_continue(DID_LAST_ARG)
+    instr.set_continue(DID_LAST_ARG)
     instr.goto_eval()
 
 def did_last_arg():
@@ -234,7 +234,7 @@ def eval_seq():
     save(UNEV)
     save(ENV)
 
-    set_continue(EVAL_SEQ_CONT)
+    instr.set_continue(EVAL_SEQ_CONT)
 
     instr.goto_eval()
 
@@ -267,7 +267,7 @@ def alt_eval_seq():
     save(UNEV)
     save(ENV)
 
-    set_continue(EVAL_SEQ_CONT)
+    instr.set_continue(EVAL_SEQ_CONT)
 
     instr.goto_eval()
 

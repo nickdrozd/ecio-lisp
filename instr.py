@@ -29,8 +29,11 @@ def goto_continue():
 def goto_eval():
     goto(EVAL_EXP)
 
+def set_continue(label):
+    assign(CONT, label)
+
 def initialize_cont():
-    assign(CONT, DONE)
+    set_continue(DONE)
 
 def initialize():
     # by the time run gets called in the repl,

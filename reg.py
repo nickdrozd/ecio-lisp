@@ -29,9 +29,6 @@ def clear_registers():
 
 # particular register operations
 
-def set_continue(label):
-    assign(CONT, label)
-
 def set_empty_arglist():
     assign(ARGL, [])
 
