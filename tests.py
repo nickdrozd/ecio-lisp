@@ -1,7 +1,6 @@
 import unittest
 
-from repl import parse_and_set_expr, get_result, initialize
-from instr import run
+from repl import ecio_eval
 
 from garbage import collect_garbage
 from mem import load_memory, write_memory, clear_memory, ROOT
@@ -9,7 +8,8 @@ from mem import load_memory, write_memory, clear_memory, ROOT
 
 class EcioTestCase(unittest.TestCase):
     def setUp(self):
-        initialize()
+        pass
+        # initialize()
 
 
 class TestRun(EcioTestCase):
@@ -51,16 +51,14 @@ class TestRun(EcioTestCase):
         # result = 357
 
         # test some repl functions too!
-        parse_and_set_expr(expr)
-        run()
-        val = get_result()
+        val = ecio_eval(expr)
 
         self.assertEqual(val, 357)
 
 
 class TestGarbageCollector(EcioTestCase):
     def test_gc(self):
-        write_memory({
+        memory = {
             "__MEM_0": [
                 {
                     "add12": [
@@ -231,7 +229,9 @@ class TestGarbageCollector(EcioTestCase):
                 },
                 "__MEM_5"
             ]
-        })
+        }
+
+        write_memory(memory)
 
         collect_garbage()
 

@@ -33,6 +33,14 @@ def repl():
         # except Exception as e: # better way to do this?
         #   print(e)
 
+def ecio_eval(expr):
+    '''Evaluates an expression without invoking the repl'''
+
+    initialize()
+    parse_and_set_expr(expr)
+    run()
+    return get_result()
+
 def initialize():
     # optional
     clear_registers()
