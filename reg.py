@@ -1,5 +1,7 @@
 import json
 
+from stats import fetch_stats
+
 EXPR = 'EXPR'
 VAL = 'VAL'
 ENV = 'ENV'
@@ -14,6 +16,7 @@ EMPTY_REG = '"***"'
 
 # basic register operations
 
+@fetch_stats
 def fetch(reg):
     with open(reg, 'r') as regf:
         return json.loads(regf.read())

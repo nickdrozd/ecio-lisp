@@ -4,12 +4,13 @@
             * gc stats
 '''
 
-STATS = 0
+STATS = 1
 
 def display_stats():
     if STATS:
         display_stack_stats()
         display_label_stats()
+        display_fetch_stats()
 
     reset_stats()
 
@@ -19,11 +20,13 @@ def reset_stats():
         COUNTERS[counter] = 0
 
 COUNTERS = {
-    'number_of_saves' : 0,
-    'curr_stack_depth' : 0,
-    'max_stack_depth' : 0,
+    'number_of_saves': 0,
+    'curr_stack_depth': 0,
+    'max_stack_depth': 0,
 
-    'labels_passed' : 0,
+    'labels_passed': 0,
+
+    'fetch_count': 0,
 }
 
 # stack stats
@@ -69,3 +72,26 @@ def goto_stats(goto_func):
         COUNTERS['labels_passed'] += 1
 
     return goto_wrapper
+
+# file i/o stats
+
+def display_fetch_stats():
+    fetches = COUNTERS['fetch_count']
+
+    print('Total fetches:', fetches)
+
+def fetch_stats(fetch_func):
+    def fetch_wrapper(reg):
+        fetched = fetch_func(reg)
+
+        COUNTERS['fetch_count'] += 1
+
+        return fetched
+
+    return fetch_wrapper
+
+
+
+
+
+
