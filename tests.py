@@ -1,10 +1,7 @@
 import unittest
 
-from reg import clear_registers
-from stack import clear_stack
-from repl import parse_and_set_expr, get_result
+from repl import parse_and_set_expr, get_result, initialize
 from instr import run
-from env import initialize_env
 
 from garbage import collect_garbage
 from mem import load_memory, write_memory, clear_memory, ROOT
@@ -12,10 +9,7 @@ from mem import load_memory, write_memory, clear_memory, ROOT
 
 class EcioTestCase(unittest.TestCase):
     def setUp(self):
-        clear_registers()
-        clear_stack()
-        clear_memory()
-        initialize_env()
+        initialize()
 
 
 class TestRun(EcioTestCase):

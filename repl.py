@@ -5,7 +5,9 @@
         * argparse, argv, cli for flags?
 '''
 
-from reg import fetch, assign, EXPR, VAL
+from reg import fetch, assign, EXPR, VAL, clear_registers
+from stack import clear_stack
+from mem import clear_memory
 from env import initialize_env
 from instr import run
 from parse import parse
@@ -19,7 +21,7 @@ def repl():
     info_flag = 0
     stats_flag = 1
 
-    initialize_env()
+    initialize()
     while True:
         try:
             get_expr()
@@ -30,6 +32,14 @@ def repl():
             break
         # except Exception as e: # better way to do this?
         #   print(e)
+
+def initialize():
+    # optional
+    clear_registers()
+    clear_stack()
+    clear_memory()
+    # required
+    initialize_env()
 
 def get_expr():
     expr = input(INTERPRETER_PROMPT)

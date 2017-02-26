@@ -4,13 +4,13 @@
 '''
 
 from reg import fetch, assign, CONT # clear_registers?
-from stack import clear_stack
+
+# initialize_run
+from env import load_global_env
+from garbage import collect_garbage_if_needed
 
 from switch import switch
 from labels import DONE, EVAL_EXP
-
-from env import load_global_env
-from garbage import collect_garbage_if_needed
 
 from stats import goto_stats
 
@@ -35,11 +35,7 @@ def set_continue(label):
 def initialize_cont():
     set_continue(DONE)
 
-def initialize():
-    # by the time run gets called in the repl,
-    # EXPR has already been set, so we can't
-    # call clear_registers
-    clear_stack()
+def initialize_run():
     collect_garbage_if_needed()
     load_global_env()
     initialize_cont()
@@ -63,7 +59,8 @@ def done():
     return fetch(INSTR) == DONE
 
 def run(info_flag=0):
-    initialize()
+    initialize_run()
+
     while not done():
         display_info(info_flag)
         step()
