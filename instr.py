@@ -62,8 +62,8 @@ def step():
 def done():
     return fetch(INSTR) == DONE
 
-def run():
+def run(info_flag=0):
     initialize()
     while not done():
-        display_info()
+        display_info(info_flag)
         step()

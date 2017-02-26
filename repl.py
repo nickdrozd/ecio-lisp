@@ -2,6 +2,7 @@
     TODO:
         * syntax checking (paren count, etc)
             * in parse or in get_expr?
+        * argparse, argv, cli for flags?
 '''
 
 from reg import fetch, assign, EXPR, VAL
@@ -15,12 +16,15 @@ INTERPRETER_EXIT = '.quit', '.exit'
 EXIT_MESSAGE = 'Byeeeeeeee!'
 
 def repl():
+    info_flag = 0
+    stats_flag = 1
+
     initialize_env()
     while True:
         try:
             get_expr()
-            run()
-            display_result()
+            run(info_flag=info_flag)
+            display_result(stats_flag=stats_flag)
         except KeyboardInterrupt:
             print()
             break
@@ -35,10 +39,10 @@ def get_expr():
     else:
         parse_and_set_expr(expr)
 
-def display_result():
+def display_result(stats_flag=1):
     print(get_result())
     print()
-    display_stats()
+    display_stats(stats_flag)
     print()
 
 def parse_and_set_expr(lisp_expr):

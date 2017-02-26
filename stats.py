@@ -4,16 +4,13 @@
             * gc stats
 '''
 
-STATS = 1
-
-def display_stats():
-    if STATS:
+def display_stats(stats_flag=0):
+    if stats_flag:
         display_stack_stats()
         display_label_stats()
         display_read_stats()
 
     reset_stats()
-
 
 def reset_stats():
     for counter in COUNTERS:
