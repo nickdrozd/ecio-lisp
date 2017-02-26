@@ -4,10 +4,12 @@
     registers are distinct.
 '''
 
-from reg import fetch, assign
+import fileio
 
 
 MEM = 'MEM'
+
+EMPTY_MEM = {}
 
 PREFIX = '__MEM_'
 
@@ -16,10 +18,10 @@ ROOT_INDEX = 0
 ROOT = PREFIX + str(ROOT_INDEX)
 
 def load_memory():
-    return fetch(MEM)
+    return fileio.read_file(MEM, default=EMPTY_MEM)
 
 def write_memory(data):
-    assign(MEM, data)
+    fileio.write_file(MEM, data)
 
 def read_from_address(address):
     memory = load_memory()
@@ -36,7 +38,7 @@ def write_to_free_address(data):
     return address
 
 def clear_memory():
-    write_memory({})
+    write_memory(EMPTY_MEM)
 
 # this is a little dramatic
 def next_free_address(memory_space):

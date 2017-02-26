@@ -1,6 +1,4 @@
-import json
-
-from stats import fetch_stats
+import fileio
 
 EXPR = 'EXPR'
 VAL = 'VAL'
@@ -16,18 +14,14 @@ EMPTY_REG = '"***"'
 
 # basic register operations
 
-@fetch_stats
 def fetch(reg):
-    with open(reg, 'r') as regf:
-        return json.loads(regf.read())
+    return fileio.read_file(reg, default=EMPTY_REG)
 
 def assign(reg, val):
-    with open(reg, 'w') as regf:
-        regf.write(json.dumps(val, sort_keys=True, indent=4))
+    fileio.write_file(reg, val)
 
 def clear_register(reg):
-    with open(reg, 'w') as regf:
-        regf.write(EMPTY_REG)
+    assign(reg, EMPTY_REG)
 
 def clear_registers():
     for reg in REGISTERS:

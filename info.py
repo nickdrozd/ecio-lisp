@@ -8,7 +8,7 @@
 '''
 
 from reg import fetch, REGISTERS
-from stack import STACK
+from stack import STACK, read_stack
 from instr import INSTR
 
 INFO = 0
@@ -33,7 +33,7 @@ def show_registers():
 
 def show_stack():
     print(STACK)
-    for entry in fetch(STACK):
+    for entry in read_stack(STACK):
         print(' *', entry)
 
 def show_instr():

@@ -1,27 +1,29 @@
-'''
-The stack is conceptually distinct from the
-registers, but in terms of file I/O, it will
-work the same, so it will be implemented
-using basic register operations.
-'''
-
+import fileio
 from reg import fetch, assign
 from stats import save_stats, restore_stats
 
 STACK = 'STACK'
 
+EMPTY_STACK = []
+
+def read_stack():
+    return fileio.read_file(STACK, default=EMPTY_STACK)
+
+def write_stack(data):
+    fileio.write_file(STACK, data)
+
 @save_stats
 def save(reg):
     reg_contents = fetch(reg)
-    stack = fetch(STACK)
+    stack = read_stack()
     join = [reg_contents] + stack
-    assign(STACK, join)
+    write_stack(join)
 
 @restore_stats
 def restore(reg):
     top, *rest = fetch(STACK)
     assign(reg, top)
-    assign(STACK, rest)
+    write_stack(rest)
 
 def clear_stack():
-    assign(STACK, [])
+    write_stack(EMPTY_STACK)

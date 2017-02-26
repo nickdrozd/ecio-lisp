@@ -10,7 +10,7 @@ def display_stats():
     if STATS:
         display_stack_stats()
         display_label_stats()
-        display_fetch_stats()
+        display_read_stats()
 
     reset_stats()
 
@@ -26,7 +26,7 @@ COUNTERS = {
 
     'labels_passed': 0,
 
-    'fetch_count': 0,
+    'read_count': 0,
 }
 
 # stack stats
@@ -75,23 +75,16 @@ def goto_stats(goto_func):
 
 # file i/o stats
 
-def display_fetch_stats():
-    fetches = COUNTERS['fetch_count']
+def display_read_stats():
+    reads = COUNTERS['read_count']
 
-    print('Total fetches:', fetches)
+    print('Total file reads:', reads)
 
-def fetch_stats(fetch_func):
-    def fetch_wrapper(reg):
-        fetched = fetch_func(reg)
+def read_stats(read_func):
+    def read_wrapper(reg, *args, **kwargs):
+        contents = read_func(reg, *args, **kwargs)
+        COUNTERS['read_count'] += 1
 
-        COUNTERS['fetch_count'] += 1
+        return contents
 
-        return fetched
-
-    return fetch_wrapper
-
-
-
-
-
-
+    return read_wrapper
