@@ -13,6 +13,7 @@ from switch import switch
 from labels import DONE, EVAL_EXP
 
 from stats import goto_stats
+from stats import run_stats
 
 INSTR = 'INSTR'
 
@@ -58,6 +59,7 @@ def step():
 def done():
     return fetch(INSTR) == DONE
 
+@run_stats
 def run(info_flag=0):
     initialize_run()
 

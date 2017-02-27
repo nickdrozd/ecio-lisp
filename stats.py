@@ -4,11 +4,15 @@
             * gc stats
 '''
 
+import time
+
+
 def display_stats(stats_flag=0):
     if stats_flag:
         display_stack_stats()
         display_label_stats()
         display_read_stats()
+        display_run_time()
 
     reset_stats()
 
@@ -85,3 +89,20 @@ def read_stats(read_func):
         return contents
 
     return read_wrapper
+
+# run stats
+
+def run_stats(run_func):
+    def run_wrapper(*args, **kwargs):
+        start = time.time()
+        run_func(*args, **kwargs)
+        elapsed = time.time() - start
+
+        COUNTERS['run_time'] = elapsed
+
+    return run_wrapper
+
+def display_run_time():
+    run_time = COUNTERS['run_time']
+
+    print('Run-time:', run_time)
