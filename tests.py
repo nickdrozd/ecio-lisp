@@ -55,6 +55,23 @@ class TestRun(EcioTestCase):
 
         self.assertEqual(val, 357)
 
+    def test_loop(self):
+        expr = '''
+            (begin
+                (def count 0)
+                (def loop
+                    (λ ()
+                        (if (= count 10)
+                            (_* count count)
+                            (begin
+                                (set! count (_+ count 1))
+                                (loop)))))
+                (loop))
+        '''
+
+        val = ecio_eval(expr)
+
+        self.assertEqual(val, 100)
 
 class TestGarbageCollector(EcioTestCase):
     def test_gc(self):
