@@ -10,6 +10,7 @@
     TODO:
         * clean up mem imports
             * consolidate read/write functions?
+            * should read_from_address return env, address pair?
 '''
 
 from reg import fetch, assign, ENV, VAL, UNEV, ARGL
@@ -65,13 +66,12 @@ def set_var():
     while env:
         frame, enclosure = env
         if var in frame:
-            frame[var] = val  # side effect!
-            write_to_address(env, address)
+            frame[var] = val
+            updated_env = [frame, enclosure]
+            write_to_address(updated_env, address)
             return
         else:
-            env, address = read_from_address(enclosure)
-
-
+            env, address = read_from_address(enclosure), enclosure
 
     # raise exception? return dummy val?
 
