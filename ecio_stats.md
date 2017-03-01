@@ -212,20 +212,6 @@ Run-time: 1.3859965801239014
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 02/28/17
 
 As per SICP exercise 5.32, added a check to function evaluation to skip saving the env in the case that the function is a variable (requiring only lookup).
@@ -426,4 +412,214 @@ Max stack depth: 10
 Labels passed: 734
 Total file reads: 3668
 Run-time: 1.293924331665039
+
+
+
+
+
+
+
+
+
+02/28/17
+
+Add a check for simple arguments. This appears to be a much more profitable optimization than the simple func check, but that may be because these stats only cover a function with simple functions.
+
+
+    (begin
+      (def fibonacci
+        (λ (n)
+          (if (< n 2)
+              n
+              (_+ (fibonacci (_- n 1))
+                  (fibonacci (_- n 2))))))
+      (fibonacci {}))
+
+n = 0
+
+Total saves: 13
+Max stack depth: 6
+Labels passed: 49
+Total file reads: 216
+Run-time: 0.06912827491760254
+
+n = 1
+
+Total saves: 13
+Max stack depth: 6
+Labels passed: 49
+Total file reads: 216
+Run-time: 0.06911444664001465
+
+n = 2
+
+Total saves: 39
+Max stack depth: 10
+Labels passed: 167
+Total file reads: 712
+Run-time: 0.2130730152130127
+
+n = 3
+
+Total saves: 65
+Max stack depth: 15
+Labels passed: 285
+Total file reads: 1208
+Run-time: 0.35520005226135254
+
+n = 4
+
+Total saves: 117
+Max stack depth: 20
+Labels passed: 521
+Total file reads: 2200
+Run-time: 0.6575515270233154
+
+n = 5
+
+Total saves: 195
+Max stack depth: 25
+Labels passed: 875
+Total file reads: 3688
+Run-time: 1.104053020477295
+
+n = 6
+
+Total saves: 325
+Max stack depth: 30
+Labels passed: 1465
+Total file reads: 6168
+Run-time: 1.8697834014892578
+
+n = 7
+
+Total saves: 533
+Max stack depth: 35
+Labels passed: 2409
+Total file reads: 10136
+Run-time: 3.1492176055908203
+
+n = 8
+
+Total saves: 871
+Max stack depth: 40
+Labels passed: 3943
+Total file reads: 16584
+Run-time: 5.249367713928223
+
+n = 9
+
+Total saves: 1417
+Max stack depth: 45
+Labels passed: 6421
+Total file reads: 27000
+Run-time: 8.8052237033844
+
+n = 10
+
+Total saves: 2301
+Max stack depth: 50
+Labels passed: 10433
+Total file reads: 43864
+Run-time: 15.587692499160767
+
+
+    (begin
+      (def fibonacci
+        (λ (n)
+          (def loop
+            (λ (a b count)
+               (if (= count n)
+                   a
+                   (loop b (_+ a b) (_+ count 1)))))
+          (loop 0 1 0)))
+      (fibonacci {}))
+
+n = 0
+
+Total saves: 20
+Max stack depth: 6
+Labels passed: 80
+Total file reads: 356
+Run-time: 0.1110382080078125
+
+n = 1
+
+Total saves: 35
+Max stack depth: 7
+Labels passed: 156
+Total file reads: 679
+Run-time: 0.20235037803649902
+
+n = 2
+
+Total saves: 50
+Max stack depth: 7
+Labels passed: 232
+Total file reads: 1002
+Run-time: 0.2878115177154541
+
+n = 3
+
+Total saves: 65
+Max stack depth: 7
+Labels passed: 308
+Total file reads: 1325
+Run-time: 0.4055898189544678
+
+n = 4
+
+Total saves: 80
+Max stack depth: 7
+Labels passed: 384
+Total file reads: 1648
+Run-time: 0.505164384841919
+
+n = 5
+
+Total saves: 95
+Max stack depth: 7
+Labels passed: 460
+Total file reads: 1971
+Run-time: 0.6050670146942139
+
+n = 6
+
+Total saves: 110
+Max stack depth: 7
+Labels passed: 536
+Total file reads: 2294
+Run-time: 0.7012438774108887
+
+n = 7
+
+Total saves: 125
+Max stack depth: 7
+Labels passed: 612
+Total file reads: 2617
+Run-time: 0.7806341648101807
+
+n = 8
+
+Total saves: 140
+Max stack depth: 7
+Labels passed: 688
+Total file reads: 2940
+Run-time: 0.9037270545959473
+
+n = 9
+
+Total saves: 155
+Max stack depth: 7
+Labels passed: 764
+Total file reads: 3263
+Run-time: 0.994060754776001
+
+n = 10
+
+Total saves: 170
+Max stack depth: 7
+Labels passed: 840
+Total file reads: 3586
+Run-time: 1.0769333839416504
 

@@ -33,6 +33,10 @@ switch = {
     ARG_LOOP : arg_loop,
     ACC_ARG : acc_arg,
     DID_LAST_ARG : did_last_arg,
+    COMPOUND_ARG : compound_arg,
+    SIMPLE_ARG : simple_arg,
+    DID_SIMPLE_ARG : did_simple_arg,
+    RESTORE_FUNC : restore_func,
 
     EVAL_BEGIN : eval_begin,
 

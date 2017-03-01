@@ -160,18 +160,37 @@ def check_no_args():
     save(FUNC)
     instr.goto(ARG_LOOP)
 
-def arg_loop():
-    save(ARGL)
+# unev has args, func and cont are on the stack #
 
+def arg_loop():
     first, *rest = fetch(UNEV)
 
     assign(EXPR, first)
+    assign(UNEV, rest)
 
-    if not rest: # if no_remaining_args():
-        instr.goto(LAST_ARG)
+    if expr_is_simple():
+        instr.goto(SIMPLE_ARG)
         return
 
-    assign(UNEV, rest)
+    instr.goto(COMPOUND_ARG)
+
+def simple_arg():
+    instr.set_continue(DID_SIMPLE_ARG)
+    instr.goto_eval()
+
+def did_simple_arg():
+    adjoin_arg()
+    if not fetch(UNEV):
+        instr.goto(RESTORE_FUNC)
+        return
+    instr.goto(ARG_LOOP)
+
+def compound_arg():
+    save(ARGL)
+    
+    if not fetch(UNEV): # if no_remaining_args():
+        instr.goto(LAST_ARG)
+        return
 
     save(ENV)
     save(UNEV)
@@ -196,8 +215,10 @@ def did_last_arg():
     restore(ARGL)
     adjoin_arg()
 
-    restore(FUNC)
+    instr.goto(RESTORE_FUNC)
 
+def restore_func():
+    restore(FUNC)
     instr.goto(APPLY_FUNC)
 
 ###
