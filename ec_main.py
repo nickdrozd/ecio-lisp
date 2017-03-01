@@ -10,6 +10,8 @@ from env import *
 import instr
 from labels import *
 from prim import is_primitive_func, apply_primitive_func
+from eval_exp import expr_is_simple
+
 
 ###
 
@@ -119,12 +121,16 @@ def eval_begin():
 
 def eval_func():
     save(CONT)
-    save(ENV)
 
     func, *args = fetch(EXPR)
     assign(EXPR, func)
     assign(UNEV, args)
 
+    if expr_is_simple():
+        instr.goto(SIMPLE_FUNC)
+        return
+
+    save(ENV)
     save(UNEV)
 
     instr.set_continue(DID_FUNC)
@@ -135,12 +141,17 @@ def did_func():
     restore(ENV)
 
     assign(FUNC, fetch(VAL))
-    set_empty_arglist()
 
     # cont is still/already saved
     instr.goto(CHECK_NO_ARGS)
 
+def simple_func():
+    assign(FUNC, lookup(EXPR))
+    instr.goto(CHECK_NO_ARGS)
+
 def check_no_args():
+    set_empty_arglist()
+
     if not fetch(UNEV): # if no_args():
         instr.goto(APPLY_FUNC)
         return

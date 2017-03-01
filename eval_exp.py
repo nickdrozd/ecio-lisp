@@ -44,3 +44,7 @@ def is_num(exp):
 
 def is_var(exp):
     return isinstance(exp, str)
+
+def expr_is_simple():
+    expr = fetch(EXPR)
+    return is_num(expr) or is_var(expr)
