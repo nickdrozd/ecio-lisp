@@ -20,30 +20,30 @@ class TestRun(EcioTestCase):
     '''
     def test_run(self):
         expr = '''
-            (begin
-                (def x 2)
-                (def y 3)
-                (def z 4)
-                (set! z (_+ z (_+ x y)))
-                (def fibonacci
-                    (λ (n)
-                        (if (< n 2)
-                            n
-                            (_+ (fibonacci (_- n 1))
-                                (fibonacci (_- n 2))))))
-                (def fibz (fibonacci z))
-                (set! x
-                    (_* ((λ (x) (_* x x)) 3)
-                        fibz))
-                (def addabc
-                    (λ (a)
-                        (λ (b)
-                            (λ (c)
-                                (λ (x)
-                                    (_+ x (_+ a (_+ b c))))))))
-                (def d8 (λ () 8))
-                (def result ((((addabc x) fibz) z) (d8)))
-                result)
+            (def x 2)
+            (def y 3)
+            (def z 4)
+            (set! z (_+ z (_+ x y)))
+            (def fibonacci
+              (λ (n)
+                (if (< n 2)
+                    n
+                    (_+ (fibonacci (_- n 1))
+                        (fibonacci (_- n 2))))))
+            (def fibz (fibonacci z))
+            (set! x
+              (_* ((λ (x)
+                    (_* x x)) 3)
+                  fibz))
+            (def addabc
+              (λ (a)
+                (λ (b)
+                  (λ (c)
+                    (λ (x)
+                      (_+ x (_+ a (_+ b c))))))))
+            (def d8 (λ () 8))
+            (def result ((((addabc x) fibz) z) (d8)))
+            result
         '''
         # z = 9
         # fibz = 34
@@ -51,20 +51,20 @@ class TestRun(EcioTestCase):
         # result = 357
 
         # test some repl functions too!
-        val = ecio_eval(expr)
+        self.load_and_run(expr)
 
-        self.assertEqual(val, 357)
+        self.assert_result(357)
 
     def test_loop(self):
         expr = '''
             (def count 0)
             (def loop
-                (λ ()
-                    (if (= count 10)
-                        (_* count count)
-                        (begin
-                            (set! count (_+ count 1))
-                            (loop)))))
+              (λ ()
+                (if (= count 10)
+                    (_* count count)
+                    (begin
+                      (set! count (_+ count 1))
+                      (loop)))))
             (loop)
         '''
 
@@ -82,21 +82,21 @@ class TestRun(EcioTestCase):
             (set! x 3)
             (set! result (_+ result x))
             (def f
-                (λ ()
-                    (def x 4)
-                    (set! result (_+ result x))
-                    (set! x 5)
-                    (set! result (_+ result x))))
+              (λ ()
+                (def x 4)
+                (set! result (_+ result x))
+                (set! x 5)
+                (set! result (_+ result x))))
             (f)
             (def g
-                (λ ()
-                    (def x 6)
-                    (def h
-                        (λ ()
-                            (set! x (_+ x 1))
-                            (set! result (_+ result x))))
-                    (set! result (_+ result x))
-                    (h)))
+              (λ ()
+                (def x 6)
+                (def h
+                  (λ ()
+                    (set! x (_+ x 1))
+                    (set! result (_+ result x))))
+                (set! result (_+ result x))
+                (h)))
             (g)
         '''
     
