@@ -80,7 +80,10 @@ def extend_env():
     params = fetch(UNEV)
     args = fetch(ARGL)
 
-    new_frame = dict(zip(params, args))
+    if isinstance(params, str):
+        new_frame = dict(zip([params], [args]))
+    else:
+        new_frame = dict(zip(params, args))
 
     ext_env = [new_frame, env_pointer]
 
