@@ -57,21 +57,68 @@ class TestRun(EcioTestCase):
 
     def test_loop(self):
         expr = '''
-            (begin
-                (def count 0)
-                (def loop
-                    (λ ()
-                        (if (= count 10)
-                            (_* count count)
-                            (begin
-                                (set! count (_+ count 1))
-                                (loop)))))
-                (loop))
+            (def count 0)
+            (def loop
+                (λ ()
+                    (if (= count 10)
+                        (_* count count)
+                        (begin
+                            (set! count (_+ count 1))
+                            (loop)))))
+            (loop)
         '''
 
-        val = ecio_eval(expr)
+        self.load_and_run(expr)
 
-        self.assertEqual(val, 100)
+        self.assert_result(100)
+
+    def test_redefinition(self):
+        expr = '''
+            (def result 0)
+            (def x 1)
+            (set! result (_+ result x))
+            (def x 2)
+            (set! result (_+ result x))
+            (set! x 3)
+            (set! result (_+ result x))
+            (def f
+                (λ ()
+                    (def x 4)
+                    (set! result (_+ result x))
+                    (set! x 5)
+                    (set! result (_+ result x))))
+            (f)
+            (def g
+                (λ ()
+                    (def x 6)
+                    (def h
+                        (λ ()
+                            (set! x (_+ x 1))
+                            (set! result (_+ result x))))
+                    (set! result (_+ result x))
+                    (h)))
+            (g)
+        '''
+    
+
+        self.load_and_run(expr)
+
+        self.assert_result(28)
+
+    # 
+
+    def assert_result(self, expected):
+        self.assertEqual(
+            self.result,
+            expected,
+            'Wrong result')
+
+    def load_and_run(self, statements):
+        begin_seq = '(begin {})'.format(statements)
+        self.result = ecio_eval(begin_seq)
+
+
+
 
 class TestGarbageCollector(EcioTestCase):
     def test_gc(self):
