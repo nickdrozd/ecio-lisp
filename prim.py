@@ -5,40 +5,61 @@
 '''
 
 import operator
+from parse import parse
 
 from reg import fetch, assign, FUNC, ARGL, VAL
 
-PRIM_ADD = '_+'
-PRIM_MUL = '_*'
-PRIM_SUB = '_-'
-PRIM_DIV = '_/'
+# primitive i/o
 
-PRIM_EQ = '='
-PRIM_LT = '<'
-PRIM_GT = '>'
-
-PRIMITIVES = {
-    PRIM_ADD : operator.add,
-    PRIM_MUL : operator.mul,
-    PRIM_SUB : operator.sub,
-    PRIM_DIV : operator.floordiv,
-
-    PRIM_EQ : operator.eq,
-    PRIM_LT : operator.lt,
-    PRIM_GT : operator.gt,
+ARITY_0 = {
+    'read' : lambda: parse(input()),
 }
 
-def is_primitive_func():
+ARITY_1 = {
+    'show' : print,
+}
+
+ARITY_2 = {
+    # primitive arithmetic
+
+    '_+' : operator.add,
+    '_*' : operator.mul,
+    '_-' : operator.sub,
+    '_/' : operator.floordiv,
+
+    '=' : operator.eq,
+    '<' : operator.lt,
+    '>' : operator.gt,
+}
+
+def is_primitive(var):
     try:
-        return fetch(FUNC) in PRIMITIVES
+        return any(
+            var in primitives for primitives in
+            [ARITY_0, ARITY_1, ARITY_2]
+        )
     except TypeError:
         return False
+    
+def is_primitive_func():
+    return is_primitive(fetch(FUNC))
 
 # prim funcs assumed to take two args
 def apply_primitive_func():
-    func = PRIMITIVES[fetch(FUNC)]
-    arg1, arg2 = fetch(ARGL)
+    func = fetch(FUNC)
 
-    result = func(arg1, arg2)
+    if func in ARITY_0:
+        prim = ARITY_0[func]
+        result = prim()
+
+    if func in ARITY_1:
+        prim = ARITY_1[func]
+        arg1, = fetch(ARGL)
+        result = prim(arg1)
+
+    if func in ARITY_2:
+        prim = ARITY_2[func]
+        arg1, arg2 = fetch(ARGL)
+        result = prim(arg1, arg2)
 
     assign(VAL, result)

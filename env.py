@@ -14,7 +14,7 @@
 '''
 
 from reg import fetch, assign, ENV, VAL, UNEV, ARGL
-from prim import PRIMITIVES
+from prim import is_primitive
 from mem import ROOT, read_from_address, write_to_address, write_to_free_address
 
 
@@ -35,7 +35,7 @@ def lookup(reg):
     "return the value bound to var (in reg) in current env"
     var = fetch(reg)
 
-    if var in PRIMITIVES:
+    if is_primitive(var):
         return var
 
     env, _ = read_env_from_memory()
