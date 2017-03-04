@@ -3,7 +3,7 @@ import unittest
 from repl import ecio_eval
 
 from garbage import collect_garbage
-from mem import load_memory, write_memory, clear_memory, ROOT
+from mem import load_memory, write_memory, ROOT
 
 
 class EcioTestCase(unittest.TestCase):
@@ -99,13 +99,13 @@ class TestRun(EcioTestCase):
                 (h)))
             (g)
         '''
-    
+
 
         self.load_and_run(expr)
 
         self.assert_result(28)
 
-    # 
+    #
 
     def assert_result(self, expected):
         self.assertEqual(

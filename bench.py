@@ -1,5 +1,6 @@
 from repl import ecio_eval
-from stats import display_stats 
+from stats import display_stats
+
 
 def run_benchmark():
     recursive_fib = '''
@@ -40,22 +41,20 @@ def run_benchmark():
         10: 55,
     }
 
-    names = {
-        recursive_fib: 'RECURSIVE',
-        iterative_fib: 'ITERATIVE'
+    functions = {
+        'RECURSIVE': recursive_fib,
+        'ITERATIVE': iterative_fib,
     }
 
-    exprs = recursive_fib, iterative_fib
-
-    for expr in exprs:
-        print(expr)
+    for function_name, function in functions.items():
+        print(function_name)
 
         for i in range(11):
             print('n = {}'.format(i))
             print()
 
             expected = fib_vals[i]
-            result = ecio_eval(expr.format(i))
+            result = ecio_eval(function.format(i))
 
             if result != expected:
                 print('Incorrect result')
@@ -63,6 +62,7 @@ def run_benchmark():
 
             display_stats(1)
             print()
+
 
 if __name__ == '__main__':
     run_benchmark()

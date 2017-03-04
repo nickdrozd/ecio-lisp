@@ -3,14 +3,16 @@
         * figure out import mess
 '''
 
-from reg import *
-from stack import *
-from env import *
-# from instr import instr.goto, instr.goto_continue, instr.goto_eval
+from reg import EXPR, ENV, FUNC, ARGL, CONT, VAL, UNEV
+from reg import assign, fetch, set_empty_arglist, adjoin_arg
+from stack import save, restore
+from env import lookup, define_var, set_var, extend_env
 import instr
-from labels import *
 from prim import is_primitive_func, apply_primitive_func
 from eval_exp import expr_is_simple
+
+# pylint: disable=wildcard-import,unused-wildcard-import
+from labels import *
 
 
 ###
@@ -187,7 +189,7 @@ def did_simple_arg():
 
 def compound_arg():
     save(ARGL)
-    
+
     if not fetch(UNEV): # if no_remaining_args():
         instr.goto(LAST_ARG)
         return
@@ -288,7 +290,7 @@ def alt_eval_seq():
 
     # if no_exps...
     if not exps:
-        instr.goto(EVAL_SEQ_END)
+        instr.goto(ALT_EVAL_SEQ_END)
         return
 
     first, *rest = fetch(UNEV)
@@ -299,9 +301,15 @@ def alt_eval_seq():
     save(UNEV)
     save(ENV)
 
-    instr.set_continue(EVAL_SEQ_CONT)
+    instr.set_continue(ALT_EVAL_SEQ_CONT)
 
     instr.goto_eval()
+
+def alt_eval_seq_cont():
+    restore(ENV)
+    restore(UNEV)
+
+    instr.goto(ALT_EVAL_SEQ)
 
 def alt_eval_seq_end():
     restore(CONT)

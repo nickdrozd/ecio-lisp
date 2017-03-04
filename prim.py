@@ -40,7 +40,7 @@ def is_primitive(var):
         )
     except TypeError:
         return False
-    
+
 def is_primitive_func():
     return is_primitive(fetch(FUNC))
 

@@ -9,7 +9,7 @@ from reg import fetch, assign, CONT # clear_registers?
 from env import load_global_env
 from garbage import collect_garbage_if_needed
 
-from switch import switch
+from switch import SWITCH
 from labels import DONE, EVAL_EXP
 
 from stats import goto_stats
@@ -18,7 +18,9 @@ from stats import run_stats
 INSTR = 'INSTR'
 
 # info.py imports INSTR
+# pylint: disable=wrong-import-position
 from info import display_info
+
 
 @goto_stats
 def goto(label):
@@ -46,7 +48,7 @@ def step():
     label = fetch(INSTR)
 
     try:
-        next_instr = switch[label]
+        next_instr = SWITCH[label]
     except:
         raise Exception('Unknown label: {}'.format(label))
 

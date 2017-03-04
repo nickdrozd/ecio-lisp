@@ -3,10 +3,10 @@
         * better formatting
 '''
 
-
 from reg import fetch, REGISTERS
 from stack import STACK, read_stack
 from instr import INSTR
+
 
 def display_info(info_flag=0):
     if info_flag:

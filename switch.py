@@ -1,9 +1,12 @@
+# pylint: disable=wildcard-import,unused-wildcard-import
+
 from labels import *
 
 from eval_exp import eval_exp
 from ec_main import *
 
-switch = {
+
+SWITCH = {
     EVAL_EXP : eval_exp,
 
     EVAL_NUM : eval_num,
@@ -50,5 +53,6 @@ switch = {
     EVAL_SEQ_LAST : eval_seq_last,
 
     ALT_EVAL_SEQ : alt_eval_seq,
+    ALT_EVAL_SEQ_CONT : alt_eval_seq_cont,
     ALT_EVAL_SEQ_END : alt_eval_seq_end,
 }

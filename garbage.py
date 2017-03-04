@@ -53,7 +53,8 @@ def update_env_pointers(old_env, forwarding):
     }
 
     new_enclosure = (forwarding[old_enclosure]
-        if old_enclosure is not None else None)
+                     if old_enclosure is not None
+                     else None)
 
     new_env = [new_frame, new_enclosure]
 

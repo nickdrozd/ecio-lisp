@@ -8,6 +8,9 @@ in the ass and this one is at least as good
 as any of mine.)
 '''
 
+# pylint: skip-file
+# because I didn't write this!
+
 # primary functions
 
 def parse(program):
