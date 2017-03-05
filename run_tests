@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# test functions
+
+function lint {
+    echo 'Linting...'
+    python3 -m pylint --rcfile=.pylintrc --reports=n *.py
+}
+
+function tests {
+    python3 -m unittest -vf tests.py
+}
+
+# main
+
+test_funcs="
+    lint
+    tests
+"
+
+for test_func in $test_funcs; do
+    if ! $test_func; then
+        echo "Failed $test_func"
+        exit 1
+    fi
+done
