@@ -100,10 +100,22 @@ class TestRun(EcioTestCase):
             (g)
         '''
 
-
         self.load_and_run(expr)
 
         self.assert_result(28)
+
+    def test_list_primitives(self):
+        expr = '''
+            (def a (quote (1 2 3)))
+            (def b (cons (car a)
+                         (cdr (cdr a))))
+            (def c (cons a b))
+            (car (cdr c))
+        '''
+
+        self.load_and_run(expr)
+
+        self.assert_result(1)
 
     #
 

@@ -9,6 +9,7 @@ from parse import parse
 
 from reg import fetch, assign, FUNC, ARGL, VAL
 
+
 # primitive i/o
 
 ARITY_0 = {
@@ -17,9 +18,14 @@ ARITY_0 = {
 
 ARITY_1 = {
     'show' : print,
+
+    'car' : lambda p: p[0],
+    'cdr' : lambda p: p[1:],  # cdr must be a list
 }
 
 ARITY_2 = {
+    'cons' : lambda a, d: [a] + d,
+
     # primitive arithmetic
 
     '_+' : operator.add,
