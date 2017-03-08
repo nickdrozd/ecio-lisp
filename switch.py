@@ -15,6 +15,9 @@ SWITCH = {
 
     EVAL_QUOTE : eval_quote,
 
+    EVAL_QUASIQUOTE : eval_quasiquote,
+    QUASIQUOTE_LOOP : quasiquote_loop,
+
     EVAL_LAMBDA : eval_lambda,
 
     EVAL_DEF : eval_def,

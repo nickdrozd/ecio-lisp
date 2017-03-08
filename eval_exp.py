@@ -3,7 +3,8 @@ from keywords import *
 from reg import fetch, EXPR
 from labels import EVAL_VAR, EVAL_NUM, EVAL_DEF,\
                    EVAL_ASS, EVAL_LAMBDA, EVAL_IF,\
-                   EVAL_BEGIN, EVAL_QUOTE, EVAL_FUNC
+                   EVAL_QUOTE, EVAL_QUASIQUOTE,\
+                   EVAL_BEGIN, EVAL_FUNC
 import instr
 # from instr import goto
 
@@ -30,7 +31,8 @@ def get_eval_label(expr):
         LAMBDA_KEYS : EVAL_LAMBDA,
         IF_KEYS : EVAL_IF,
         BEGIN_KEYS : EVAL_BEGIN,
-        QUOTE_KEYS : EVAL_QUOTE
+        QUOTE_KEYS : EVAL_QUOTE,
+        QUASIQUOTE_KEYS : EVAL_QUASIQUOTE,
     }
 
     for group in keyword_groups:
@@ -49,6 +51,15 @@ def is_num(exp):
 def is_var(exp):
     return isinstance(exp, str)
 
+def is_simple(expr):
+    return is_num(expr) or is_var(expr)
+
 def expr_is_simple():
     expr = fetch(EXPR)
-    return is_num(expr) or is_var(expr)
+    return is_simple(expr)
+
+def is_unquoted(expr):
+    try:
+        return expr[0] in UNQUOTE_KEYS
+    except TypeError:
+        return False

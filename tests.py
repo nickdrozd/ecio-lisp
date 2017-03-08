@@ -1,6 +1,7 @@
 import unittest
 
 from repl import ecio_eval
+from parse import parse
 
 from garbage import collect_garbage
 from mem import load_memory, write_memory, ROOT
@@ -116,6 +117,28 @@ class TestRun(EcioTestCase):
         self.load_and_run(expr)
 
         self.assert_result(1)
+
+
+    def test_quasiquote(self):
+      # list should be part of the standard library
+        expr = '''
+          (def list (λ s s))
+          (def a 3)
+          (def b 4)
+          (def c 5)
+          (def d 6)
+          (quasiquote
+            ((_* a a)
+              (unq (_* a b))
+              (_+ a c)
+              d
+              (unq d)))
+        '''
+
+        self.load_and_run(expr)
+
+        self.assert_result(parse(
+            '((_* a a) 12 (_+ a c) d 6)'))
 
     #
 

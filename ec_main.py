@@ -9,7 +9,7 @@ from stack import save, restore
 from env import lookup, define_var, set_var, extend_env
 import instr
 from prim import is_primitive_func, apply_primitive_func
-from eval_exp import expr_is_simple
+from eval_exp import expr_is_simple, is_simple, is_unquoted
 
 # pylint: disable=wildcard-import,unused-wildcard-import
 from labels import *
@@ -29,6 +29,39 @@ def eval_quote():
     _, text = fetch(EXPR)
     assign(VAL, text)
     instr.goto_continue()
+
+###
+
+def eval_quasiquote():
+    _, text = fetch(EXPR)
+
+    if is_simple(text):
+        instr.goto(EVAL_QUOTE)
+        return
+
+    assign(UNEV, text)
+    assign(EXPR, ['list'])
+
+    instr.goto(QUASIQUOTE_LOOP)
+
+def quasiquote_loop():
+    first, *rest = fetch(UNEV)
+
+    if is_unquoted(first):
+        assign(EXPR,
+               fetch(EXPR) + [first[1]])
+
+    if not is_unquoted(first):
+        assign(EXPR,
+               fetch(EXPR) + [['quote', first]])
+
+    if not rest:
+        instr.goto_eval()
+        return
+
+    assign(UNEV, rest)
+
+    instr.goto(QUASIQUOTE_LOOP)
 
 ###
 
