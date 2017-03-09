@@ -9,7 +9,7 @@ from stack import save, restore
 from env import lookup, define_var, set_var, extend_env
 import instr
 from prim import is_primitive_func, apply_primitive_func
-from eval_exp import expr_is_simple, is_simple, is_unquoted
+from keywords import is_simple, is_unquoted
 
 # pylint: disable=wildcard-import,unused-wildcard-import
 from labels import *
@@ -161,7 +161,7 @@ def eval_func():
     assign(EXPR, func)
     assign(UNEV, args)
 
-    if expr_is_simple():
+    if is_simple(func):
         instr.goto(SIMPLE_FUNC)
         return
 
@@ -203,7 +203,7 @@ def arg_loop():
     assign(EXPR, first)
     assign(UNEV, rest)
 
-    if expr_is_simple():
+    if is_simple(first):
         instr.goto(SIMPLE_ARG)
         return
 
