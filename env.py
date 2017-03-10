@@ -14,6 +14,7 @@
 '''
 
 from reg import fetch, assign, ENV, VAL, UNEV, ARGL
+from lib import LIBRARY
 from prim import is_primitive
 from mem import ROOT, read_from_address, write_to_address, write_to_free_address
 
@@ -92,7 +93,7 @@ def extend_env():
 # initialization
 
 def initial_env():
-    return [{}, None]
+    return [LIBRARY, None]
 
 def initialize_env():
     write_to_address(initial_env(), ROOT)

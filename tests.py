@@ -24,24 +24,23 @@ class TestRun(EcioTestCase):
             (def x 2)
             (def y 3)
             (def z 4)
-            (set! z (_+ z (_+ x y)))
+            (set! z (+ z x y))
             (def fibonacci
               (λ (n)
                 (if (< n 2)
                     n
-                    (_+ (fibonacci (_- n 1))
-                        (fibonacci (_- n 2))))))
+                    (+ (fibonacci (- n 1))
+                        (fibonacci (- n 2))))))
             (def fibz (fibonacci z))
             (set! x
-              (_* ((λ (x)
-                    (_* x x)) 3)
+              (* (square 3)
                   fibz))
             (def addabc
               (λ (a)
                 (λ (b)
                   (λ (c)
                     (λ (x)
-                      (_+ x (_+ a (_+ b c))))))))
+                      (+ x a b c))))))
             (def d8 (λ () 8))
             (def result ((((addabc x) fibz) z) (d8)))
             result
@@ -62,9 +61,9 @@ class TestRun(EcioTestCase):
             (def loop
               (λ ()
                 (if (= count 10)
-                    (_* count count)
+                    (* count count)
                     (begin
-                      (set! count (_+ count 1))
+                      (set! count (+ count 1))
                       (loop)))))
             (loop)
         '''
@@ -77,26 +76,26 @@ class TestRun(EcioTestCase):
         expr = '''
             (def result 0)
             (def x 1)
-            (set! result (_+ result x))
+            (set! result (+ result x))
             (def x 2)
-            (set! result (_+ result x))
+            (set! result (+ result x))
             (set! x 3)
-            (set! result (_+ result x))
+            (set! result (+ result x))
             (def f
               (λ ()
                 (def x 4)
-                (set! result (_+ result x))
+                (set! result (+ result x))
                 (set! x 5)
-                (set! result (_+ result x))))
+                (set! result (+ result x))))
             (f)
             (def g
               (λ ()
                 (def x 6)
                 (def h
                   (λ ()
-                    (set! x (_+ x 1))
-                    (set! result (_+ result x))))
-                (set! result (_+ result x))
+                    (set! x (+ x 1))
+                    (set! result (+ result x))))
+                (set! result (+ result x))
                 (h)))
             (g)
         '''
@@ -120,17 +119,15 @@ class TestRun(EcioTestCase):
 
 
     def test_quasiquote(self):
-      # list should be part of the standard library
         expr = '''
-          (def list (λ s s))
           (def a 3)
           (def b 4)
           (def c 5)
           (def d 6)
           (quasiquote
-            ((_* a a)
-              (unq (_* a b))
-              (_+ a c)
+            ((* a a a)
+              (unq (* a b c))
+              (+ a c d)
               d
               (unq d)))
         '''
@@ -138,7 +135,7 @@ class TestRun(EcioTestCase):
         self.load_and_run(expr)
 
         self.assert_result(parse(
-            '((_* a a) 12 (_+ a c) d 6)'))
+            '((* a a a) 60 (+ a c d) d 6)'))
 
     #
 
