@@ -14,12 +14,10 @@
 '''
 
 from reg import fetch, assign, ENV, VAL, UNEV, ARGL
+from labels import UNBOUND
 from lib import LIBRARY
 from prim import is_primitive
 from mem import ROOT, read_from_address, write_to_address, write_to_free_address
-
-
-UNBOUND = 'UNBOUND'
 
 
 def read_env_from_memory():
@@ -49,6 +47,9 @@ def lookup(reg):
             env = read_from_address(enclosure) if enclosure else None
 
     return UNBOUND
+
+def is_unbound(reg):
+    return fetch(reg) == UNBOUND
 
 def define_var():
     "bind var (in UNEV) to val (in VAL) in the most recent frame"

@@ -12,6 +12,7 @@ SWITCH = {
     EVAL_NUM : eval_num,
 
     EVAL_VAR : eval_var,
+    UNBOUND: unbound,
 
     EVAL_QUOTE : eval_quote,
 

@@ -6,7 +6,7 @@
 from reg import EXPR, ENV, FUNC, ARGL, CONT, VAL, UNEV
 from reg import assign, fetch, set_empty_arglist, adjoin_arg
 from stack import save, restore
-from env import lookup, define_var, set_var, extend_env
+from env import lookup, is_unbound, define_var, set_var, extend_env
 import instr
 from prim import is_primitive_func, apply_primitive_func
 from keywords import is_simple, is_unquoted
@@ -23,7 +23,16 @@ def eval_num():
 
 def eval_var():
     assign(VAL, lookup(EXPR))
+
+    if is_unbound(VAL):
+        instr.goto(UNBOUND)
+        return
+
     instr.goto_continue()
+
+def unbound():
+    print('UNBOUND')
+    instr.goto(DONE)
 
 def eval_quote():
     _, text = fetch(EXPR)
@@ -182,6 +191,11 @@ def did_func():
 
 def simple_func():
     assign(FUNC, lookup(EXPR))
+
+    if is_unbound(FUNC):
+        instr.goto(UNBOUND)
+        return
+
     instr.goto(CHECK_NO_ARGS)
 
 def check_no_args():
