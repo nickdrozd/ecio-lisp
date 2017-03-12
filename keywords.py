@@ -14,6 +14,8 @@ QUASIQUOTE_KEYS = 'quasiquote', 'qsq'
 
 UNQUOTE_KEYS = 'unquote', 'unq'
 
+DEFMACRO_KEYS = 'defmacro', 'defmac'
+
 ###
 
 def is_num(exp):

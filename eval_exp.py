@@ -1,11 +1,9 @@
 # pylint: disable=wildcard-import,unused-wildcard-import
 from keywords import *
 from reg import fetch, EXPR
-from labels import EVAL_VAR, EVAL_NUM, EVAL_DEF,\
-                   EVAL_ASS, EVAL_LAMBDA, EVAL_IF,\
-                   EVAL_QUOTE, EVAL_QUASIQUOTE,\
-                   EVAL_BEGIN, EVAL_FUNC
+from labels import *
 import instr
+from env import is_macro
 # from instr import goto
 
 def eval_exp():
@@ -33,11 +31,15 @@ def get_eval_label(expr):
         BEGIN_KEYS : EVAL_BEGIN,
         QUOTE_KEYS : EVAL_QUOTE,
         QUASIQUOTE_KEYS : EVAL_QUASIQUOTE,
+        DEFMACRO_KEYS : EVAL_DEFMACRO,
     }
 
     for group in keyword_groups:
         if tag in group:
             return keyword_groups[group]
+
+    if is_macro(tag):
+        return EVAL_MACRO
 
     # default
     return EVAL_FUNC

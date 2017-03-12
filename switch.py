@@ -27,6 +27,11 @@ SWITCH = {
     EVAL_ASS : eval_ass,
     DID_ASS_VAL : did_ass_val,
 
+    EVAL_DEFMACRO : eval_defmacro,
+
+    EVAL_MACRO : eval_macro,
+    DID_MACRO : did_macro,
+
     EVAL_IF : eval_if,
     IF_DECIDE : if_decide,
     IF_THEN : if_then,

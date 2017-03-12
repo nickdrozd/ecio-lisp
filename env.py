@@ -11,11 +11,12 @@
         * clean up mem imports
             * consolidate read/write functions?
             * should read_from_address return env, address pair?
+        * figure out define / defmacro interactions
 '''
 
-from reg import fetch, assign, ENV, VAL, UNEV, ARGL
+from reg import fetch, assign, EXPR, ENV, VAL, UNEV, ARGL
 from labels import UNBOUND
-from lib import LIBRARY
+from lib import LIBRARY, MACRO
 from prim import is_primitive
 from mem import ROOT, read_from_address, write_to_address, write_to_free_address
 
@@ -76,6 +77,26 @@ def set_var():
             env, address = read_from_address(enclosure), enclosure
 
     # raise exception? return dummy val?
+
+def define_macro():
+    _, macro_name, params, expr = fetch(EXPR)
+
+    macro_def = [MACRO, params, expr]
+
+    # all macros are assigned to global env
+    global_frame, enclosure = read_from_address(ROOT)
+
+    # add macro name to macro list
+    global_frame[MACRO].append(macro_name)
+
+    # install macro
+    global_frame[macro_name] = macro_def
+
+    write_to_address([global_frame, enclosure], ROOT)
+
+def is_macro(expr):
+    global_frame, _ = read_from_address(ROOT)
+    return expr in global_frame[MACRO]
 
 def extend_env():
     env_pointer = fetch(ENV)

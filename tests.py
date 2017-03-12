@@ -137,6 +137,23 @@ class TestRun(EcioTestCase):
         self.assert_result(parse(
             '((* a a a) 60 (+ a c d) d 6)'))
 
+    def test_macro(self):
+        expr = '''
+          (def x 5)
+          (defmac 0! (var) (qsq (set! (unq var) 0)))
+          (defmac 1! (var) (qsq (set! (unq var) 1)))
+          (def y (_+ x 2))
+          (0! x)
+          (def z (_+ y x))
+          (1! y)
+          (set! z (_+ z y))
+          z
+        '''
+
+        self.load_and_run(expr)
+
+        self.assert_result(8)
+
     #
 
     def assert_result(self, expected):
