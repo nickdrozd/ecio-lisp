@@ -441,6 +441,7 @@ def eval_macro():
 
     assign(EXPR, macro_body)
 
+    save(ENV)
     save(CONT)
 
     instr.set_continue(DID_MACRO)
@@ -448,5 +449,7 @@ def eval_macro():
 
 def did_macro():
     restore(CONT)
+    restore(ENV)
+
     assign(EXPR, fetch(VAL))
     instr.goto_eval()

@@ -64,7 +64,6 @@ class TestRun(EcioTestCase):
         self.assert_result(2200)
 
     def test_redefinition(self):
-        # macros don't work in function calls?
         self.expr = '''
           (def result 0)
           (def x 1)
@@ -76,18 +75,18 @@ class TestRun(EcioTestCase):
           (def f
             (λ ()
               (def x 4)
-              (set! result (+ result x))
+              (inc-n! result x)
               (set! x 5)
-              (set! result (+ result x))))
+              (inc-n! result x)))
           (f)
           (def g
             (λ ()
               (def x 6)
               (def h
                 (λ ()
-                  (set! x (+ x 1))
-                  (set! result (+ result x))))
-              (set! result (+ result x))
+                  (inc-n! x 1)
+                  (inc-n! result x)))
+              (inc-n! result x)
               (h)))
           (g)
         '''
