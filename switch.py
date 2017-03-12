@@ -17,7 +17,13 @@ SWITCH = {
     EVAL_QUOTE : eval_quote,
 
     EVAL_QUASIQUOTE : eval_quasiquote,
-    QUASIQUOTE_LOOP : quasiquote_loop,
+    QSQ_LOOP : qsq_loop,
+    QSQ_SIMPLE : qsq_simple,
+    QSQ_UNQUOTED : qsq_unquoted,
+    QSQ_SUBLIST : qsq_sublist,
+    DID_QSQ_SUBLIST : did_qsq_sublist,
+    QSQ_CHECK_REST : qsq_check_rest,
+    DID_QUASIQUOTE : did_quasiquote,
 
     EVAL_LAMBDA : eval_lambda,
 

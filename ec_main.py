@@ -42,39 +42,6 @@ def eval_quote():
 
 ###
 
-def eval_quasiquote():
-    _, text = fetch(EXPR)
-
-    if is_simple(text):
-        instr.goto(EVAL_QUOTE)
-        return
-
-    assign(UNEV, text)
-    assign(EXPR, ['list'])
-
-    instr.goto(QUASIQUOTE_LOOP)
-
-def quasiquote_loop():
-    first, *rest = fetch(UNEV)
-
-    if is_unquoted(first):
-        assign(EXPR,
-               fetch(EXPR) + [first[1]])
-
-    if not is_unquoted(first):
-        assign(EXPR,
-               fetch(EXPR) + [['quote', first]])
-
-    if not rest:
-        instr.goto_eval()
-        return
-
-    assign(UNEV, rest)
-
-    instr.goto(QUASIQUOTE_LOOP)
-
-###
-
 def eval_lambda():
     _, params, *body = fetch(EXPR)
     assign(UNEV, params)
@@ -362,6 +329,95 @@ def alt_eval_seq_cont():
 def alt_eval_seq_end():
     restore(CONT)
     instr.goto_continue()
+
+###
+
+def eval_quasiquote():
+    _, text = fetch(EXPR)
+
+    if is_simple(text):
+        instr.goto(EVAL_QUOTE)
+        return
+
+    assign(EXPR, text)
+    assign(ARGL, ['list'])
+
+    save(CONT)
+    instr.set_continue(DID_QUASIQUOTE)
+
+    instr.goto(QSQ_LOOP)
+
+def qsq_loop():
+    first, *rest = fetch(EXPR)
+
+    assign(UNEV, rest)
+    assign(EXPR, first)
+
+    if is_simple(first):
+        instr.goto(QSQ_SIMPLE)
+        return
+
+    if is_unquoted(first):
+        instr.goto(QSQ_UNQUOTED)
+        return
+
+    instr.goto(QSQ_SUBLIST)
+
+def qsq_simple():
+    # distinguish numbers and variables?
+
+    assign(VAL, ['quote', fetch(EXPR)])
+
+    adjoin_arg()
+
+    instr.goto(QSQ_CHECK_REST)
+
+def qsq_unquoted():
+    _, text = fetch(EXPR)
+
+    assign(VAL, text)
+
+    adjoin_arg()
+
+    instr.goto(QSQ_CHECK_REST)
+
+def qsq_sublist():
+    save(ARGL)
+    save(UNEV)
+    save(CONT)
+
+    assign(ARGL, ['list'])
+
+    instr.set_continue(DID_QSQ_SUBLIST)
+
+    instr.goto(QSQ_LOOP)
+
+def did_qsq_sublist():
+    assign(VAL, fetch(ARGL))
+
+    restore(CONT)
+    restore(UNEV)
+    restore(ARGL)
+
+    adjoin_arg()
+
+    instr.goto(QSQ_CHECK_REST)
+
+def qsq_check_rest():
+    if not fetch(UNEV):
+        instr.goto_continue()
+        return
+
+    assign(EXPR, fetch(UNEV))
+
+    instr.goto(QSQ_LOOP)
+
+def did_quasiquote():
+    restore(CONT)
+
+    assign(EXPR, fetch(ARGL))
+
+    instr.goto_eval()
 
 ###
 
