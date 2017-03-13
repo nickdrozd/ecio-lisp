@@ -11,8 +11,8 @@ BEGIN_KEYS = 'begin', 'progn'
 QUOTE_KEYS = 'quote',
 
 QUASIQUOTE_KEYS = 'quasiquote', 'qsq'
-
 UNQUOTE_KEYS = 'unquote', 'unq'
+SPLICE_KEYS = 'splice', 'spl'
 
 DEFMACRO_KEYS = 'defmacro', 'defmac'
 
@@ -30,8 +30,16 @@ def is_var(exp):
 def is_simple(expr):
     return is_num(expr) or is_var(expr)
 
-def is_unquoted(expr):
+###
+
+def has_tag(expr, tag_keys):
     try:
-        return expr[0] in UNQUOTE_KEYS
+        return expr[0] in tag_keys
     except TypeError:
         return False
+
+def is_unquoted(expr):
+    return has_tag(expr, UNQUOTE_KEYS)
+
+def is_splice(expr):
+    return has_tag(expr, SPLICE_KEYS)

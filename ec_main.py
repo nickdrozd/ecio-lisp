@@ -10,7 +10,7 @@ from env import lookup, is_unbound,\
     define_var, define_macro, set_var, extend_env
 import instr
 from prim import is_primitive_func, apply_primitive_func
-from keywords import is_simple, is_unquoted
+from keywords import is_simple, is_unquoted, is_splice
 
 # pylint: disable=wildcard-import,unused-wildcard-import
 from labels import *
@@ -361,11 +361,13 @@ def qsq_loop():
         instr.goto(QSQ_UNQUOTED)
         return
 
+    if is_splice(first):
+        instr.goto(QSQ_SPLICE)
+        return
+
     instr.goto(QSQ_SUBLIST)
 
 def qsq_simple():
-    # distinguish numbers and variables?
-
     assign(VAL, ['quote', fetch(EXPR)])
 
     adjoin_arg()
@@ -378,6 +380,28 @@ def qsq_unquoted():
     assign(VAL, text)
 
     adjoin_arg()
+
+    instr.goto(QSQ_CHECK_REST)
+
+def qsq_splice():
+    _, text = fetch(EXPR)
+
+    assign(EXPR, text)
+
+    save(ARGL)
+    save(UNEV)
+    save(CONT)
+
+    instr.set_continue(QSQ_DID_SPLICE)
+
+    instr.goto_eval()
+
+def qsq_did_splice():
+    restore(CONT)
+    restore(UNEV)
+    restore(ARGL)
+
+    assign(ARGL, fetch(ARGL) + fetch(VAL))
 
     instr.goto(QSQ_CHECK_REST)
 
@@ -430,13 +454,14 @@ def eval_defmacro():
 def eval_macro():
     macro, *args = fetch(EXPR)
 
+    assign(ARGL, args)
     assign(EXPR, macro)
+
     assign(EXPR, lookup(EXPR))
 
     _, params, macro_body = fetch(EXPR)
 
     assign(UNEV, params)
-    assign(ARGL, args)
     extend_env()
 
     assign(EXPR, macro_body)

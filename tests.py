@@ -1,7 +1,7 @@
 import unittest
 
 from repl import ecio_eval
-# from parse import parse
+from parse import parse
 
 from garbage import collect_garbage
 from mem import load_memory, write_memory, ROOT
@@ -15,7 +15,7 @@ class EcioTestCase(unittest.TestCase):
 
 class TestRun(EcioTestCase):
     def test_run(self):
-        self.expr = '''
+        self.eval_seq('''
           (def x 2)
           (def y 3)
           (def z 4)
@@ -38,7 +38,7 @@ class TestRun(EcioTestCase):
           (def d8 (λ () 8))
           (def result ((((addabc x) fibz) z) (d8)))
           result
-        '''
+        ''')
         # z = 9
         # fibz = 34
         # x = 306
@@ -47,7 +47,7 @@ class TestRun(EcioTestCase):
         self.assert_result(357)
 
     def test_loop(self):
-        self.expr = '''
+        self.eval_seq('''
           (def total 0)
           (def count 0)
           (def loop
@@ -59,12 +59,12 @@ class TestRun(EcioTestCase):
                     (inc-n! total (square count))
                     (loop)))))
           (loop)
-        '''
+        ''')
 
         self.assert_result(2200)
 
     def test_redefinition(self):
-        self.expr = '''
+        self.eval_seq('''
           (def result 0)
           (def x 1)
           (inc-n! result x)
@@ -89,21 +89,32 @@ class TestRun(EcioTestCase):
               (inc-n! result x)
               (h)))
           (g)
-        '''
+        ''')
 
         self.assert_result(28)
+
+    def test_quasiquote(self):
+        self.eval_seq('''
+          (def a (qsq (0 1 2)))
+          (def b (qsq (0 (unq (_+ 1 2)) 4)))
+          (def c (qsq (0 (spl (list 1 2)) 4)))
+          (qsq (a (spl a)
+                b (unq b)
+                c (unq c)))
+        ''')
+
+        self.assert_result(
+            '(a 0 1 2 b (0 3 4) c (0 1 2 4))')
 
     #
 
     def assert_result(self, expected):
-        self.eval_expr()
-
         self.assertEqual(
             self.result,
-            expected,
+            parse(str(expected)),
             'Wrong result')
 
-    def eval_expr(self):
+    def eval_seq(self, expr):
         begin_seq = '''
           (begin
             (defmac inc-n! (var n)
@@ -111,7 +122,7 @@ class TestRun(EcioTestCase):
                          (_+ (unq var)
                              (unq n)))))
             {})
-        '''.format(self.expr)
+        '''.format(expr)
 
         self.result = ecio_eval(begin_seq)
 

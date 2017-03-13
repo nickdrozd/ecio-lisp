@@ -20,6 +20,8 @@ SWITCH = {
     QSQ_LOOP : qsq_loop,
     QSQ_SIMPLE : qsq_simple,
     QSQ_UNQUOTED : qsq_unquoted,
+    QSQ_SPLICE : qsq_splice,
+    QSQ_DID_SPLICE : qsq_did_splice,
     QSQ_SUBLIST : qsq_sublist,
     DID_QSQ_SUBLIST : did_qsq_sublist,
     QSQ_CHECK_REST : qsq_check_rest,
