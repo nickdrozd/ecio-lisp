@@ -35,7 +35,7 @@ class TestRun(EcioTestCase):
                 (λ (c)
                   (λ (x)
                     (+ x a b c))))))
-          (def d8 (λ () 8))
+          (def d8 (delay 8))
           (def result ((((addabc x) fibz) z) (d8)))
           result
         ''')
@@ -73,7 +73,7 @@ class TestRun(EcioTestCase):
           (set! x 3)
           (inc-n! result x)
           (def f
-            (λ ()
+            (delay
               (def x 4)
               (inc-n! result x)
               (set! x 5)
@@ -121,6 +121,7 @@ class TestRun(EcioTestCase):
               (qsq (set! (unq var)
                          (_+ (unq var)
                              (unq n)))))
+            (defmac delay exprs (qsq (λ () (spl exprs))))
             {})
         '''.format(expr)
 

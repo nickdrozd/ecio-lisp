@@ -28,14 +28,14 @@ def is_var(exp):
     return isinstance(exp, str)
 
 def is_simple(expr):
-    return is_num(expr) or is_var(expr)
+    return is_num(expr) or is_var(expr) or expr == []
 
 ###
 
 def has_tag(expr, tag_keys):
     try:
         return expr[0] in tag_keys
-    except TypeError:
+    except (TypeError, IndexError):
         return False
 
 def is_unquoted(expr):

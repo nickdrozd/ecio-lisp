@@ -18,7 +18,7 @@ INTERPRETER_EXIT = '.quit', '.exit'
 EXIT_MESSAGE = 'Byeeeeeeee!'
 
 def repl():
-    info_flag = 0
+    info_flag = 1
     stats_flag = 1
 
     initialize()
