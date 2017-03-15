@@ -31,9 +31,9 @@ def write_env_to_new_memory(env):
     address = write_to_free_address(env)
     assign(ENV, address)
 
-def lookup(reg):
-    "return the value bound to var (in reg) in current env"
-    var = fetch(reg)
+def lookup_expr():
+    "return the value bound to var (in EXPR) in current env"
+    var = fetch(EXPR)
 
     if is_primitive(var):
         return var
