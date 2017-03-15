@@ -35,7 +35,6 @@ def eval_var():
     instr.goto_continue()
 
 def unbound():
-    print('UNBOUND')
     instr.goto(DONE)
 
 def eval_quote():
@@ -161,12 +160,11 @@ def did_func():
     instr.goto(CHECK_NO_ARGS)
 
 def simple_func():
-    # what if func is number? catch at parse?
-    assign(FUNC, lookup_expr())
+    instr.set_continue(DID_SIMPLE_FUNC)
+    instr.goto_eval()
 
-    if is_unbound(FUNC):
-        instr.goto(UNBOUND)
-        return
+def did_simple_func():
+    assign(FUNC, fetch(VAL))
 
     instr.goto(CHECK_NO_ARGS)
 

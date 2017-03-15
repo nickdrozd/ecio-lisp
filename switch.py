@@ -48,6 +48,7 @@ SWITCH = {
     EVAL_FUNC : eval_func,
     DID_FUNC : did_func,
     SIMPLE_FUNC : simple_func,
+    DID_SIMPLE_FUNC : did_simple_func,
     CHECK_NO_ARGS : check_no_args,
     LAST_ARG : last_arg,
     ARG_LOOP : arg_loop,
