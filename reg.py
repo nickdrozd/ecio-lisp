@@ -29,9 +29,6 @@ def clear_registers():
 
 # particular register operations
 
-def set_empty_arglist():
-    assign(ARGL, [])
-
 def adjoin_arg():
     curr_args = fetch(ARGL)
     new_arg = fetch(VAL)

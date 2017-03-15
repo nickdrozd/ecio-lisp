@@ -1,10 +1,13 @@
 '''
     TODO:
         * figure out import mess
+        * treat first arg as special case to avoid
+            saving the empty list (SICP footnote 5.23)
+
 '''
 
 from reg import EXPR, ENV, FUNC, ARGL, CONT, VAL, UNEV
-from reg import assign, fetch, set_empty_arglist, adjoin_arg
+from reg import assign, fetch, adjoin_arg
 from stack import save, restore
 from env import lookup_expr, is_unbound,\
     define_var, define_macro, set_var, extend_env
@@ -168,7 +171,7 @@ def simple_func():
     instr.goto(CHECK_NO_ARGS)
 
 def check_no_args():
-    set_empty_arglist()
+    assign(ARGL, [])
 
     if not fetch(UNEV): # if no_args():
         instr.goto(APPLY_FUNC)
@@ -198,14 +201,17 @@ def simple_arg():
 
 def did_simple_arg():
     adjoin_arg()
+
     if not fetch(UNEV):
         instr.goto(RESTORE_FUNC)
         return
+
     instr.goto(ARG_LOOP)
 
 def compound_arg():
     save(ARGL)
 
+    # 'evlis' tail recursion
     if not fetch(UNEV): # if no_remaining_args():
         instr.goto(LAST_ARG)
         return
