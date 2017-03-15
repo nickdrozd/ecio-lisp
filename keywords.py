@@ -44,23 +44,23 @@ DEFMACRO_KEYS = 'defmacro', 'defmac'
 @dispatch_stats
 def keyword_dispatch(expr):
     if is_var(expr):
-        return 'EVAL_VAR'
+        return 'ANALYZE_VAR'
 
     if is_num(expr):
-        return 'EVAL_NUM'
+        return 'ANALYZE_NUM'
 
     # else
     tag, *_ = expr
 
     keyword_groups = {
-        DEFINE_KEYS : 'EVAL_DEF',
-        ASS_KEYS : 'EVAL_ASS',
-        LAMBDA_KEYS : 'EVAL_LAMBDA',
-        IF_KEYS : 'EVAL_IF',
-        BEGIN_KEYS : 'EVAL_BEGIN',
-        QUOTE_KEYS : 'EVAL_QUOTE',
-        QUASIQUOTE_KEYS : 'EVAL_QUASIQUOTE',
-        DEFMACRO_KEYS : 'EVAL_DEFMACRO',
+        DEFINE_KEYS : 'ANALYZE_DEF',
+        ASS_KEYS : 'ANALYZE_ASS',
+        LAMBDA_KEYS : 'ANALYZE_LAMBDA',
+        IF_KEYS : 'ANALYZE_IF',
+        BEGIN_KEYS : 'ANALYZE_BEGIN',
+        QUOTE_KEYS : 'ANALYZE_QUOTE',
+        QUASIQUOTE_KEYS : 'ANALYZE_QUASIQUOTE',
+        DEFMACRO_KEYS : 'ANALYZE_DEFMACRO',
     }
 
     for group in keyword_groups:
@@ -68,10 +68,10 @@ def keyword_dispatch(expr):
             return keyword_groups[group]
 
     if is_macro(tag):
-        return 'EVAL_MACRO'
+        return 'ANALYZE_MACRO'
 
     # default
-    return 'EVAL_FUNC'
+    return 'ANALYZE_CALL'
 
 ###
 

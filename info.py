@@ -13,7 +13,7 @@ def display_info(info_flag=0):
         show_instr()
         show_registers()
         show_stack()
-        print()
+        # input()
         divider('*', 3)
 
 def show_register(reg):
@@ -31,7 +31,7 @@ def show_stack():
     for entry in read_stack():
         print(' *', entry)
     divider('*', 3)
-    print('\n\n')
+    print('\n')
 
 def show_instr():
     print(INSTR)

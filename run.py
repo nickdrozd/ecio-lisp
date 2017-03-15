@@ -28,6 +28,8 @@ def step():
     except:
         raise Exception('Unknown label: {}'.format(label))
 
+    # input()
+
 @run_stats
 def run(info_flag=0):
     initialize_run()

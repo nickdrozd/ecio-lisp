@@ -1,175 +1,556 @@
+# pylint: skip-file
 from reg import EXPR, ENV, FUNC, ARGL, CONT, VAL, UNEV
+
 from reg import assign, fetch, adjoin_arg
 from stack import save, restore
-from env import lookup_expr, is_unbound,\
-    define_var, define_macro, set_var, extend_env
-from instr import goto, goto_continue, set_continue
-from prim import is_primitive_func, apply_primitive_func
+from instr import goto, set_continue, goto_continue
+
 from keywords import keyword_dispatch, is_simple, is_unquoted, is_splice
 
-# pylint: disable=invalid-name
+from env import lookup_expr, is_unbound,\
+    define_var, define_macro, set_var, extend_env
+from prim import is_primitive_func, apply_primitive_func
 
-###
 
 def EVAL_EXPR():
+    save(CONT)
+    save(ENV)
+
+    set_continue(DID_ANALYSIS)
+
+    goto(ANALYZE)
+
+def ANALYZE():
     expr = fetch(EXPR)
-    eval_label = keyword_dispatch(expr)
-    goto(eval_label)
+    label = keyword_dispatch(expr)
+    goto(label)
+
+def DID_ANALYSIS():
+    restore(ENV)
+    restore(CONT)
+
+    assign(EXPR, fetch(VAL))
+
+    goto(EXECUTE)
+
+def EXECUTE():
+    label, expr = fetch(EXPR)
+
+    assign(EXPR, expr)
+
+    goto(label)
 
 ###
 
-def EVAL_NUM():
-    assign(VAL, fetch(EXPR))
+def ANALYZE_NUM():
+    num = fetch(EXPR)
+
+    assign(VAL, ['EXECUTE_NUM', num])
+
     goto_continue()
 
-def EVAL_VAR():
+def EXECUTE_NUM():
+    num = fetch(EXPR)
+
+    assign(VAL, num)
+
+    goto_continue()
+
+###
+
+def ANALYZE_QUOTE():
+    text = fetch(EXPR)
+
+    assign(VAL, ['EXECUTE_QUOTE', text])
+
+    goto_continue()
+
+def EXECUTE_QUOTE():
+    text = fetch(EXPR)
+
+    assign(VAL, text)
+
+    goto_continue()
+
+###
+
+def ANALYZE_VAR():
+    var = fetch(EXPR)
+
+    assign(VAL, ['EXECUTE_VAR', var])
+
+    goto_continue()
+
+def EXECUTE_VAR():
     assign(VAL, lookup_expr())
 
-    if is_unbound(VAL):
-        goto(UNBOUND)
+    goto_continue()
+
+###
+
+def ANALYZE_LAMBDA():
+    _, params, *body = fetch(EXPR)
+
+    assign(EXPR, body)
+    assign(UNEV, params)
+
+    save(CONT)
+    save(UNEV)
+
+    set_continue(DID_LAMBDA_BODY)
+
+    goto(ANALYZE_SEQUENCE)
+
+def DID_LAMBDA_BODY():
+    restore(UNEV)
+    restore(CONT)
+
+    params, body = fetch(UNEV), fetch(VAL)
+
+    assign(VAL, ['EXECUTE_LAMBDA', [params, body]])
+
+    goto_continue()
+
+def EXECUTE_LAMBDA():
+    params, body = fetch(EXPR)
+    env = fetch(ENV)
+
+    assign(VAL, [env, params, body])
+
+    goto_continue()
+
+###
+
+def ANALYZE_BEGIN():
+    _, *exprs = fetch(EXPR)
+
+    assign(EXPR, exprs)
+
+    goto(ANALYZE_SEQUENCE)
+
+###
+
+def ANALYZE_SEQUENCE():
+    save(CONT)
+
+    set_continue(DID_SEQ_MAP)
+
+    goto(MAP_ANALYZE)
+
+def DID_SEQ_MAP():
+    restore(CONT)
+
+    first, *rest = fetch(ARGL)
+
+    assign(EXPR, first)
+    assign(UNEV, rest)
+
+    goto(SEQ_LOOP)
+
+def SEQ_LOOP():
+    # first, *rest in EXPR, UNEV
+    if not fetch(UNEV):
+        goto(DID_SEQ_ANALYSIS)
         return
 
+    first = fetch(EXPR)
+    second, *rest = fetch(UNEV)
+
+    assign(UNEV, rest)
+
+    assign(EXPR, ['EXECUTE_SEQ', [first, second]])
+
+    goto(SEQ_LOOP)
+
+def DID_SEQ_ANALYSIS():
+    assign(VAL, fetch(EXPR))
+
     goto_continue()
 
-def UNBOUND():
-    goto('DONE')
+def EXECUTE_SEQ():
+    first, last = fetch(EXPR)
 
-def EVAL_QUOTE():
-    _, text = fetch(EXPR)
-    assign(VAL, text)
-    goto_continue()
+    assign(EXPR, first)
+    assign(UNEV, last)
+
+    if not fetch(EXPR):
+        goto(EXECUTE)
+        return
+
+    save(CONT)
+    save(ENV)
+    save(UNEV)
+
+    set_continue(DID_FIRST_EXPR)
+
+    goto(EXECUTE)
+
+def DID_FIRST_EXPR():
+    restore(UNEV)
+    restore(ENV)
+    restore(CONT)
+
+    assign(EXPR, fetch(UNEV))
+
+    goto(EXECUTE)
 
 ###
 
-def EVAL_LAMBDA():
-    _, params, *body = fetch(EXPR)
-    assign(UNEV, params)
-    assign(EXPR, body)
-    assign(VAL, [
-        fetch(ENV),
-        fetch(UNEV),
-        fetch(EXPR),
-    ])
-    goto_continue()
-
-###
-
-def EVAL_DEF():
+def ANALYZE_DEF():
     _, var, val = fetch(EXPR)
+
+    assign(EXPR, val)
+    assign(UNEV, var)
+
+    save(CONT)
+    save(UNEV)
+
+    set_continue(DID_DEF_VAL_ANALYSIS)
+
+    goto(ANALYZE)
+
+def DID_DEF_VAL_ANALYSIS():
+    restore(UNEV)
+    restore(CONT)
+
+    var, val = fetch(UNEV), fetch(VAL)
+
+    assign(VAL, ['EXECUTE_DEF', [var, val]])
+
+    goto_continue()
+
+def EXECUTE_DEF():
+    var, val = fetch(EXPR)
+
     assign(UNEV, var)
     assign(EXPR, val)
-    save(UNEV)
-    save(ENV)
-    save(CONT)
-    set_continue(DID_DEF_VAL)
-    goto(EVAL_EXPR)
 
-def DID_DEF_VAL():
-    restore(CONT)
-    restore(ENV)
+    save(CONT)
+    save(ENV)
+    save(UNEV)
+
+    set_continue(DID_DEF_VAL_EXECUTION)
+
+    goto(EXECUTE)
+
+def DID_DEF_VAL_EXECUTION():
     restore(UNEV)
+    restore(ENV)
+    restore(CONT)
+
     define_var()
+
     goto_continue()
 
 ###
 
-def EVAL_ASS():
+def ANALYZE_ASS():
     _, var, val = fetch(EXPR)
+
+    assign(EXPR, val)
+    assign(UNEV, var)
+
+    save(CONT)
+    save(UNEV)
+
+    set_continue(DID_ASS_VAL_ANALYSIS)
+
+    goto(ANALYZE)
+
+def DID_ASS_VAL_ANALYSIS():
+    restore(UNEV)
+    restore(CONT)
+
+    var, val = fetch(UNEV), fetch(VAL)
+
+    assign(VAL, ['EXECUTE_ASS', [var, val]])
+
+    goto_continue()
+
+def EXECUTE_ASS():
+    var, val = fetch(EXPR)
+
     assign(UNEV, var)
     assign(EXPR, val)
-    save(UNEV)
-    save(ENV)
-    save(CONT)
-    set_continue(DID_ASS_VAL)
-    goto(EVAL_EXPR)
 
-def DID_ASS_VAL():
-    restore(CONT)
-    restore(ENV)
+    save(CONT)
+    save(ENV)
+    save(UNEV)
+
+    set_continue(DID_ASS_VAL_EXECUTION)
+
+    goto(EXECUTE)
+
+def DID_ASS_VAL_EXECUTION():
     restore(UNEV)
+    restore(ENV)
+    restore(CONT)
+
     set_var()
+
     goto_continue()
 
 ###
 
-def EVAL_IF():
-    save(ENV)
+def ANALYZE_IF():
+    _, *exprs = fetch(EXPR)
+
+    assign(EXPR, exprs)
+
     save(CONT)
-    save(EXPR)
-    _, condition, _, _ = fetch(EXPR)
-    assign(EXPR, condition)
+
+    set_continue(DID_ANAL_IF)
+
+    goto(MAP_ANALYZE)
+
+def DID_ANAL_IF():
+    restore(CONT)
+
+    assign(VAL, ['EXECUTE_IF', fetch(VAL)])
+
+    goto_continue()
+
+def EXECUTE_IF():
+    test, *alternatives = fetch(EXPR)
+
+    assign(EXPR, test)
+    assign(UNEV, alternatives)
+
+    save(CONT)
+    save(ENV)
+    save(UNEV)
+
     set_continue(IF_DECIDE)
-    goto(EVAL_EXPR)
+
+    goto(EXECUTE)
 
 def IF_DECIDE():
-    restore(EXPR)
-    restore(CONT)
-    restore(ENV)
-    if fetch(VAL): # or if isTrue(fetch(VAL))
-        goto(IF_THEN)
-    else:
-        goto(IF_ELSE)
-
-def IF_THEN():
-    _, _, consequence, _ = fetch(EXPR)
-    assign(EXPR, consequence)
-    goto(EVAL_EXPR)
-
-def IF_ELSE():
-    _, _, _, alternative = fetch(EXPR)
-    assign(EXPR, alternative)
-    goto(EVAL_EXPR)
-
-###
-
-def EVAL_BEGIN():
-    _, *body = fetch(EXPR)
-    assign(UNEV, body)
-    save(CONT)
-    goto(EVAL_SEQ)
-
-###
-
-def EVAL_FUNC():
-    save(CONT)
-
-    goto(MAP_EVAL)
-
-def MAP_EVAL():
-    func, *args = fetch(EXPR)
-
-    assign(EXPR, func)
-    assign(UNEV, args)
-
-    if is_simple(func):
-        goto(SIMPLE_FUNC)
-        return
-
-    save(ENV)
-    save(UNEV)
-
-    set_continue(DID_COMPOUND_FUNC)
-
-    goto(EVAL_EXPR)
-
-def SIMPLE_FUNC():
-    set_continue(DID_FUNC)
-
-    goto(EVAL_EXPR)
-
-def DID_COMPOUND_FUNC():
     restore(UNEV)
     restore(ENV)
+    restore(CONT)
 
-    goto(DID_FUNC)
+    # use python's truthiness
+    if fetch(VAL):
+        goto(IF_THEN)
+        return
 
-def DID_FUNC():
+    goto(IF_ELSE)
+
+def IF_THEN():
+    consequence, _ = fetch(UNEV)
+
+    assign(EXPR, consequence)
+
+    goto(EXECUTE)
+
+def IF_ELSE():
+    _, alternative = fetch(UNEV)
+
+    assign(EXPR, alternative)
+
+    goto(EXECUTE)
+
+###
+
+def ANALYZE_CALL():
+    save(CONT)
+
+    set_continue(DID_CALL_ANALYSIS)
+
+    goto(MAP_ANALYZE)
+
+def DID_CALL_ANALYSIS():
+    restore(CONT)
+
+    assign(VAL, ['EXECUTE_CALL', fetch(VAL)])
+
+    goto_continue()
+
+def EXECUTE_CALL():
+    save(CONT)
+
+    set_continue(APPLY_FUNC)
+
+    goto(MAP_EXECUTE)
+
+def APPLY_FUNC():
+    restore(CONT)
+
+    func, *args = fetch(VAL)
+
+    assign(FUNC, func)
+    assign(ARGL, args)
+
+    if is_primitive_func():
+        goto(APPLY_PRIMITIVE)
+    else:
+        goto(APPLY_COMPOUND)
+
+def APPLY_PRIMITIVE():
+    apply_primitive_func()
+
+    goto_continue()
+
+def APPLY_COMPOUND():
+    env, params, body = fetch(FUNC)
+
+    assign(EXPR, body)
+    assign(UNEV, params)
+    assign(ENV, env)
+
+    extend_env()
+
+    goto(EXECUTE)
+
+###
+
+def MAP_ANALYZE():
+    save(CONT)
+
+    # assume nonempty list
+    first, *rest = fetch(EXPR)
+
+    assign(EXPR, first)
+    assign(UNEV, rest)
+
+    if is_simple(first):
+        goto(SIMPLE_FIRST_ANALYZE)
+        return
+
+    save(UNEV)
+
+    set_continue(DID_COMPOUND_FIRST_ANALYZE)
+
+    goto(ANALYZE)
+
+def SIMPLE_FIRST_ANALYZE():
+    set_continue(DID_FIRST_ANALYZE)
+
+    goto(ANALYZE)
+
+def DID_COMPOUND_FIRST_ANALYZE():
+    restore(UNEV)
+
+    goto(DID_FIRST_ANALYZE)
+
+def DID_FIRST_ANALYZE():
     result = fetch(VAL)
 
     assign(ARGL, [result])
 
     if not fetch(UNEV):
-        goto(APPLY_FUNC)
+        goto(DID_MAP_ANALYZE)
+        return
+
+    goto(ARG_LOOP_ANALYZE)
+
+def ARG_LOOP_ANALYZE():
+    first, *rest = fetch(UNEV)
+
+    assign(EXPR, first)
+    assign(UNEV, rest)
+
+    if is_simple(first):
+        goto(SIMPLE_ARG_ANALYZE)
+        return
+
+    goto(COMPOUND_ARG_ANALYZE)
+
+def SIMPLE_ARG_ANALYZE():
+    set_continue(DID_SIMPLE_ARG_ANALYZE)
+
+    goto(ANALYZE)
+
+def DID_SIMPLE_ARG_ANALYZE():
+    adjoin_arg()
+
+    if not fetch(UNEV):
+        goto(DID_MAP_ANALYZE)
+        return
+
+    goto(ARG_LOOP_ANALYZE)
+
+def COMPOUND_ARG_ANALYZE():
+    save(ARGL)
+
+    if not fetch(UNEV):
+        goto(LAST_ARG_ANALYZE)
+        return
+
+    save(UNEV)
+
+    set_continue(ACC_ARG_ANALYZE)
+
+    goto(ANALYZE)
+
+def ACC_ARG_ANALYZE():
+    restore(UNEV)
+    restore(ARGL)
+
+    adjoin_arg()
+
+    goto(ARG_LOOP_ANALYZE)
+
+def LAST_ARG_ANALYZE():
+    set_continue(DID_LAST_ARG_ANALYZE)
+
+    goto(ANALYZE)
+
+def DID_LAST_ARG_ANALYZE():
+    restore(ARGL)
+
+    adjoin_arg()
+
+    goto(DID_MAP_ANALYZE)
+
+def DID_MAP_ANALYZE():
+    restore(CONT)
+
+    assign(VAL, (fetch(ARGL)))
+
+    goto_continue()
+
+
+###
+
+def MAP_EXECUTE():
+    save(CONT)
+
+    # assume nonempty list
+    first, *rest = fetch(EXPR)
+
+    assign(EXPR, first)
+    assign(UNEV, rest)
+
+    _, expr = fetch(EXPR)
+
+    if is_simple(expr):
+        goto(SIMPLE_FIRST)
+        return
+
+    save(UNEV)
+
+    set_continue(DID_COMPOUND_FIRST)
+
+    goto(EXECUTE)
+
+def SIMPLE_FIRST():
+    set_continue(DID_FIRST)
+
+    goto(EXECUTE)
+
+def DID_COMPOUND_FIRST():
+    restore(UNEV)
+
+    goto(DID_FIRST)
+
+def DID_FIRST():
+    result = fetch(VAL)
+
+    assign(ARGL, [result])
+
+    if not fetch(UNEV):
+        goto(DID_MAP_EXECUTE)
         return
 
     goto(ARG_LOOP)
@@ -180,7 +561,9 @@ def ARG_LOOP():
     assign(EXPR, first)
     assign(UNEV, rest)
 
-    if is_simple(first):
+    _, expr = fetch(EXPR)
+
+    if is_simple(expr):
         goto(SIMPLE_ARG)
         return
 
@@ -189,13 +572,13 @@ def ARG_LOOP():
 def SIMPLE_ARG():
     set_continue(DID_SIMPLE_ARG)
 
-    goto(EVAL_EXPR)
+    goto(EXECUTE)
 
 def DID_SIMPLE_ARG():
     adjoin_arg()
 
     if not fetch(UNEV):
-        goto(APPLY_FUNC)
+        goto(DID_MAP_EXECUTE)
         return
 
     goto(ARG_LOOP)
@@ -203,8 +586,7 @@ def DID_SIMPLE_ARG():
 def COMPOUND_ARG():
     save(ARGL)
 
-    # 'evlis' tail recursion
-    if not fetch(UNEV): # if no_remaining_args():
+    if not fetch(UNEV):
         goto(LAST_ARG)
         return
 
@@ -212,7 +594,8 @@ def COMPOUND_ARG():
     save(UNEV)
 
     set_continue(ACC_ARG)
-    goto(EVAL_EXPR)
+
+    goto(EXECUTE)
 
 def ACC_ARG():
     restore(UNEV)
@@ -226,257 +609,77 @@ def ACC_ARG():
 def LAST_ARG():
     set_continue(DID_LAST_ARG)
 
-    goto(EVAL_EXPR)
+    goto(EXECUTE)
 
 def DID_LAST_ARG():
     restore(ARGL)
 
     adjoin_arg()
 
-    goto(APPLY_FUNC)
+    goto(DID_MAP_EXECUTE)
 
-###
-
-def APPLY_FUNC():
-    func, *args = fetch(ARGL)
-
-    assign(FUNC, func)
-    assign(ARGL, args)
-
-    if is_primitive_func():
-        goto(APPLY_PRIMITIVE)
-    # if is_compound_func():
-    else:
-        goto(APPLY_COMPOUND)
-
-def APPLY_PRIMITIVE():
-    apply_primitive_func()
-
+def DID_MAP_EXECUTE():
     restore(CONT)
 
-    goto_continue()
-
-def APPLY_COMPOUND():
-    # this needs to agree with eval_lambda
-    env, params, body = fetch(FUNC)
-
-    assign(UNEV, params)
-    assign(ENV, env)
-    extend_env()
-
-    assign(UNEV, body)
-
-    goto(EVAL_SEQ)
-
-###
-
-def EVAL_SEQ():
-    first, *rest = fetch(UNEV)
-
-    assign(EXPR, first)
-
-    # if last_exp...
-    if not rest:
-        goto(EVAL_SEQ_LAST)
-        return
-
-    assign(UNEV, rest)
-
-    save(UNEV)
-    save(ENV)
-
-    set_continue(EVAL_SEQ_CONT)
-
-    goto(EVAL_EXPR)
-
-def EVAL_SEQ_CONT():
-    restore(ENV)
-    restore(UNEV)
-
-    goto(EVAL_SEQ)
-
-def EVAL_SEQ_LAST():
-    restore(CONT)
-
-    goto(EVAL_EXPR)
-
-###
-
-def ALT_EVAL_SEQ():
-    exps = fetch(UNEV)
-
-    # if no_exps...
-    if not exps:
-        goto(ALT_EVAL_SEQ_END)
-        return
-
-    first, *rest = fetch(UNEV)
-
-    assign(EXPR, first)
-    assign(UNEV, rest)
-
-    save(UNEV)
-    save(ENV)
-
-    set_continue(ALT_EVAL_SEQ_CONT)
-
-    goto(EVAL_EXPR)
-
-def ALT_EVAL_SEQ_CONT():
-    restore(ENV)
-    restore(UNEV)
-
-    goto(ALT_EVAL_SEQ)
-
-def ALT_EVAL_SEQ_END():
-    restore(CONT)
-    goto_continue()
-
-###
-
-def EVAL_QUASIQUOTE():
-    _, text = fetch(EXPR)
-
-    if is_simple(text):
-        goto(EVAL_QUOTE)
-        return
-
-    assign(EXPR, text)
-    assign(ARGL, ['list'])
-
-    save(CONT)
-    set_continue(DID_QUASIQUOTE)
-
-    goto(QSQ_LOOP)
-
-def QSQ_LOOP():
-    first, *rest = fetch(EXPR)
-
-    assign(UNEV, rest)
-    assign(EXPR, first)
-
-    if is_simple(first):
-        goto(QSQ_SIMPLE)
-        return
-
-    if is_unquoted(first):
-        goto(QSQ_UNQUOTED)
-        return
-
-    if is_splice(first):
-        goto(QSQ_SPLICE)
-        return
-
-    goto(QSQ_SUBLIST)
-
-def QSQ_SIMPLE():
-    assign(VAL, ['quote', fetch(EXPR)])
-
-    adjoin_arg()
-
-    goto(QSQ_CHECK_REST)
-
-def QSQ_UNQUOTED():
-    _, text = fetch(EXPR)
-
-    assign(VAL, text)
-
-    adjoin_arg()
-
-    goto(QSQ_CHECK_REST)
-
-def QSQ_SPLICE():
-    _, text = fetch(EXPR)
-
-    assign(EXPR, text)
-
-    save(ARGL)
-    save(UNEV)
-    save(CONT)
-
-    set_continue(QSQ_DID_SPLICE)
-
-    goto(EVAL_EXPR)
-
-def QSQ_DID_SPLICE():
-    restore(CONT)
-    restore(UNEV)
-    restore(ARGL)
-
-    assign(ARGL, fetch(ARGL) + fetch(VAL))
-
-    goto(QSQ_CHECK_REST)
-
-def QSQ_SUBLIST():
-    save(ARGL)
-    save(UNEV)
-    save(CONT)
-
-    assign(ARGL, ['list'])
-
-    set_continue(DID_QSQ_SUBLIST)
-
-    goto(QSQ_LOOP)
-
-def DID_QSQ_SUBLIST():
     assign(VAL, fetch(ARGL))
 
-    restore(CONT)
-    restore(UNEV)
-    restore(ARGL)
-
-    adjoin_arg()
-
-    goto(QSQ_CHECK_REST)
-
-def QSQ_CHECK_REST():
-    if not fetch(UNEV):
-        goto_continue()
-        return
-
-    assign(EXPR, fetch(UNEV))
-
-    goto(QSQ_LOOP)
-
-def DID_QUASIQUOTE():
-    restore(CONT)
-
-    assign(EXPR, fetch(ARGL))
-
-    goto(EVAL_EXPR)
-
-###
-
-def EVAL_DEFMACRO():
-    define_macro()
     goto_continue()
 
-###
 
-def EVAL_MACRO():
-    macro, *args = fetch(EXPR)
 
-    assign(ARGL, args)
-    assign(EXPR, macro)
 
-    assign(EXPR, lookup_expr())
 
-    _, params, macro_body = fetch(EXPR)
 
-    assign(UNEV, params)
-    extend_env()
 
-    assign(EXPR, macro_body)
 
-    save(ENV)
-    save(CONT)
 
-    set_continue(DID_MACRO)
-    goto(EVAL_EXPR)
 
-def DID_MACRO():
-    restore(CONT)
-    restore(ENV)
 
-    assign(EXPR, fetch(VAL))
-    goto(EVAL_EXPR)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
