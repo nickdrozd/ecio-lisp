@@ -623,3 +623,223 @@ Labels passed: 840
 Total file reads: 3586
 Run-time: 1.0769333839416504
 
+
+
+
+
+
+
+
+
+
+
+
+03/18/17
+
+Two changes:
+
+  1) Waiting to assign the initial until after the first arg (func) has been evaluated. This eliminates an unnecessary save of the empty arglist, as per SICP footnote 5.23.
+
+  2) Evaluating the functions along with the arguments, rather than separately, and including it in ARGL. This eliminates the FUNC saves (and also raises the question: is FUNC needed? [Answer: it probably isn't needed for the interpreter, but it's handy for the compiler.]).
+
+Which change was more impactful?
+
+Note that the run times are actually higher than before. The price of the increase in stack efficiency is a greater number of labels passed, and in this system jumping to a label is not fast.
+
+    (begin
+      (def fibonacci
+        (λ (n)
+          (if (< n 2)
+              n
+              (_+ (fibonacci (_- n 1))
+                  (fibonacci (_- n 2))))))
+      (fibonacci {}))
+
+n = 0
+
+Total saves: 11
+Max stack depth: 6
+Labels passed: 53
+Total file reads: 227
+Run-time: 0.06679940223693848
+
+n = 1
+
+Total saves: 11
+Max stack depth: 6
+Labels passed: 53
+Total file reads: 227
+Run-time: 0.0676124095916748
+
+n = 2
+
+Total saves: 30
+Max stack depth: 8
+Labels passed: 185
+Total file reads: 758
+Run-time: 0.22137761116027832
+
+n = 3
+
+Total saves: 49
+Max stack depth: 12
+Labels passed: 317
+Total file reads: 1289
+Run-time: 0.3810606002807617
+
+n = 4
+
+Total saves: 87
+Max stack depth: 16
+Labels passed: 581
+Total file reads: 2351
+Run-time: 0.7017796039581299
+
+n = 5
+
+Total saves: 144
+Max stack depth: 20
+Labels passed: 977
+Total file reads: 3944
+Run-time: 1.1670665740966797
+
+n = 6
+
+Total saves: 239
+Max stack depth: 24
+Labels passed: 1637
+Total file reads: 6599
+Run-time: 1.98274564743042
+
+n = 7
+
+Total saves: 391
+Max stack depth: 28
+Labels passed: 2693
+Total file reads: 10847
+Run-time: 3.307210683822632
+
+n = 8
+
+Total saves: 638
+Max stack depth: 32
+Labels passed: 4409
+Total file reads: 17750
+Run-time: 5.5228917598724365
+
+n = 9
+
+Total saves: 1037
+Max stack depth: 36
+Labels passed: 7181
+Total file reads: 28901
+Run-time: 9.243800640106201
+
+n = 10
+
+Total saves: 1683
+Max stack depth: 40
+Labels passed: 11669
+Total file reads: 46955
+Run-time: 15.641118049621582
+
+
+    (begin
+      (def fibonacci
+        (λ (n)
+          (def loop
+            (λ (a b count)
+               (if (= count n)
+                   a
+                   (loop b (_+ a b) (_+ count 1)))))
+          (loop 0 1 0)))
+      (fibonacci {}))
+
+n = 0
+
+Total saves: 17
+Max stack depth: 6
+Labels passed: 86
+Total file reads: 371
+Run-time: 0.11427164077758789
+
+n = 1
+
+Total saves: 28
+Max stack depth: 6
+Labels passed: 170
+Total file reads: 715
+Run-time: 0.2171478271484375
+
+n = 2
+
+Total saves: 39
+Max stack depth: 6
+Labels passed: 254
+Total file reads: 1059
+Run-time: 0.31978797912597656
+
+n = 3
+
+Total saves: 50
+Max stack depth: 6
+Labels passed: 338
+Total file reads: 1403
+Run-time: 0.40293073654174805
+
+n = 4
+
+Total saves: 61
+Max stack depth: 6
+Labels passed: 422
+Total file reads: 1747
+Run-time: 0.49988508224487305
+
+n = 5
+
+Total saves: 72
+Max stack depth: 6
+Labels passed: 506
+Total file reads: 2091
+Run-time: 0.6033778190612793
+
+n = 6
+
+Total saves: 83
+Max stack depth: 6
+Labels passed: 590
+Total file reads: 2435
+Run-time: 0.6923844814300537
+
+n = 7
+
+Total saves: 94
+Max stack depth: 6
+Labels passed: 674
+Total file reads: 2779
+Run-time: 0.7959372997283936
+
+n = 8
+
+Total saves: 105
+Max stack depth: 6
+Labels passed: 758
+Total file reads: 3123
+Run-time: 0.89408278465271
+
+n = 9
+
+Total saves: 116
+Max stack depth: 6
+Labels passed: 842
+Total file reads: 3467
+Run-time: 0.9927518367767334
+
+n = 10
+
+Total saves: 127
+Max stack depth: 6
+Labels passed: 926
+Total file reads: 3811
+Run-time: 1.0948302745819092
+

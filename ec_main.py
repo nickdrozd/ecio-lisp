@@ -1,9 +1,6 @@
 '''
     TODO:
         * figure out import mess
-        * treat first arg as special case to avoid
-            saving the empty list (SICP footnote 5.23)
-
 '''
 
 from reg import EXPR, ENV, FUNC, ARGL, CONT, VAL, UNEV
@@ -136,7 +133,11 @@ def eval_begin():
 def eval_func():
     save(CONT)
 
+    instr.goto(MAP_EVAL)
+
+def map_eval():
     func, *args = fetch(EXPR)
+
     assign(EXPR, func)
     assign(UNEV, args)
 
@@ -147,39 +148,31 @@ def eval_func():
     save(ENV)
     save(UNEV)
 
-    instr.set_continue(DID_FUNC)
+    instr.set_continue(DID_COMPOUND_FUNC)
+
     instr.goto_eval()
-
-def did_func():
-    restore(UNEV) # args
-    restore(ENV)
-
-    assign(FUNC, fetch(VAL))
-
-    # cont is still/already saved
-    instr.goto(CHECK_NO_ARGS)
 
 def simple_func():
-    instr.set_continue(DID_SIMPLE_FUNC)
+    instr.set_continue(DID_FUNC)
+
     instr.goto_eval()
 
-def did_simple_func():
-    assign(FUNC, fetch(VAL))
+def did_compound_func():
+    restore(UNEV)
+    restore(ENV)
 
-    instr.goto(CHECK_NO_ARGS)
+    instr.goto(DID_FUNC)
 
-def check_no_args():
-    assign(ARGL, [])
+def did_func():
+    result = fetch(VAL)
 
-    if not fetch(UNEV): # if no_args():
+    assign(ARGL, [result])
+
+    if not fetch(UNEV):
         instr.goto(APPLY_FUNC)
         return
 
-    # if noCompoundArgs(): ...
-    save(FUNC)
     instr.goto(ARG_LOOP)
-
-# unev has args, func and cont are on the stack #
 
 def arg_loop():
     first, *rest = fetch(UNEV)
@@ -195,13 +188,14 @@ def arg_loop():
 
 def simple_arg():
     instr.set_continue(DID_SIMPLE_ARG)
+
     instr.goto_eval()
 
 def did_simple_arg():
     adjoin_arg()
 
     if not fetch(UNEV):
-        instr.goto(RESTORE_FUNC)
+        instr.goto(APPLY_FUNC)
         return
 
     instr.goto(ARG_LOOP)
@@ -223,29 +217,32 @@ def compound_arg():
 def acc_arg():
     restore(UNEV)
     restore(ENV)
-
     restore(ARGL)
+
     adjoin_arg()
 
     instr.goto(ARG_LOOP)
 
 def last_arg():
     instr.set_continue(DID_LAST_ARG)
+
     instr.goto_eval()
 
 def did_last_arg():
     restore(ARGL)
+
     adjoin_arg()
 
-    instr.goto(RESTORE_FUNC)
-
-def restore_func():
-    restore(FUNC)
     instr.goto(APPLY_FUNC)
 
 ###
 
 def apply_func():
+    func, *args = fetch(ARGL)
+
+    assign(FUNC, func)
+    assign(ARGL, args)
+
     if is_primitive_func():
         instr.goto(APPLY_PRIMITIVE)
     # if is_compound_func():
