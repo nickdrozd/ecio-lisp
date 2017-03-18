@@ -1,70 +1,31 @@
-'''
-    TODO:
-        * figure out a better way to resolve circular imports
-'''
+import fileio
 
-from reg import fetch, assign, CONT # clear_registers?
-
-# initialize_run
-from env import load_global_env
-from garbage import collect_garbage_if_needed
-
-from switch import SWITCH
-from labels import DONE, EVAL_EXP
+from reg import fetch, assign, CONT
+from labels import EVAL_EXP
 
 from stats import goto_stats
-from stats import run_stats
 
 INSTR = 'INSTR'
 
-# info.py imports INSTR
-# pylint: disable=wrong-import-position
-from info import display_info
-
+NO_INSTR = '"???"'
 
 @goto_stats
 def goto(label):
-    assign(INSTR, label)
+    fileio.write_file(INSTR, label)
 
-def goto_continue():
-    goto(fetch(CONT))
+def curr_instr():
+    return fileio.read_file(INSTR, NO_INSTR)
+
+# these aren't strictly necessary, but they're very convenient.
+# conceptually, we can imagine that the CONT register has some
+# specialized physical connection to INSTR register
+# (or PC, or whatever it really is)
 
 def goto_eval():
     goto(EVAL_EXP)
 
+def goto_continue():
+    goto(fetch(CONT))
+
 def set_continue(label):
     assign(CONT, label)
-
-def initialize_cont():
-    set_continue(DONE)
-
-def initialize_run():
-    collect_garbage_if_needed()
-    load_global_env()
-    initialize_cont()
-    goto_eval()
-
-def step():
-    label = fetch(INSTR)
-
-    try:
-        next_instr = SWITCH[label]
-    except:
-        raise Exception('Unknown label: {}'.format(label))
-
-    if next_instr == DONE:
-        goto_eval()
-        return
-    else:
-        next_instr()
-
-def done():
-    return fetch(INSTR) == DONE
-
-@run_stats
-def run(info_flag=0):
-    initialize_run()
-
-    while not done():
-        display_info(info_flag)
-        step()

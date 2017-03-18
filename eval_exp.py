@@ -1,17 +1,17 @@
 # pylint: disable=wildcard-import,unused-wildcard-import
-from keywords import *
 from reg import fetch, EXPR
+from instr import goto
+
+from keywords import *
 from labels import *
-import instr
 from env import is_macro
-# from instr import goto
+
 
 def eval_exp():
     expr = fetch(EXPR)
     # expr = transform_macros(expr)
     eval_label = get_eval_label(expr)
-    instr.goto(eval_label)
-    # goto(eval_label)
+    goto(eval_label)
 
 def get_eval_label(expr):
     if is_var(expr):

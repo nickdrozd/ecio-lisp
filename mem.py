@@ -1,9 +1,3 @@
-'''
-    As with the stack, memory access will be implemented with
-    register operations, even though conceptually memory and
-    registers are distinct.
-'''
-
 import fileio
 
 

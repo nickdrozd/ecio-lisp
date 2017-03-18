@@ -5,12 +5,15 @@
         * argparse, argv, cli for flags?
 '''
 
-from reg import fetch, assign, EXPR, VAL, clear_registers
+from parse import parse
+from reg import fetch, assign, EXPR, VAL
+
+from reg import clear_registers
 from stack import clear_stack
 from mem import clear_memory
 from env import initialize_env
-from instr import run
-from parse import parse
+from run import run
+
 from stats import display_stats
 
 INTERPRETER_PROMPT = '<<< '
@@ -18,7 +21,7 @@ INTERPRETER_EXIT = '.quit', '.exit'
 EXIT_MESSAGE = 'Byeeeeeeee!'
 
 def repl():
-    info_flag = 1
+    info_flag = 0
     stats_flag = 1
 
     initialize()
