@@ -8,6 +8,8 @@ INSTR = 'INSTR'
 
 NO_INSTR = '"???"'
 
+DONE = 'DONE'
+
 @goto_stats
 def goto(label):
     fileio.write_file(INSTR, _convert_label(label))
@@ -19,9 +21,6 @@ def curr_instr():
 # conceptually, we can imagine that the CONT register has some
 # specialized physical connection to INSTR register
 # (or PC, or whatever it really is)
-
-def goto_eval():
-    goto('EVAL_EXP')
 
 def goto_continue():
     goto(fetch(CONT))

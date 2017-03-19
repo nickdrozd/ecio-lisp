@@ -3,11 +3,18 @@ from reg import assign, fetch, adjoin_arg
 from stack import save, restore
 from env import lookup_expr, is_unbound,\
     define_var, define_macro, set_var, extend_env
-from instr import goto, goto_continue, goto_eval, set_continue
+from instr import goto, goto_continue, set_continue
 from prim import is_primitive_func, apply_primitive_func
-from keywords import is_simple, is_unquoted, is_splice
+from keywords import keyword_dispatch, is_simple, is_unquoted, is_splice
 
 # pylint: disable=invalid-name
+
+###
+
+def EVAL_EXPR():
+    expr = fetch(EXPR)
+    eval_label = keyword_dispatch(expr)
+    goto(eval_label)
 
 ###
 
@@ -55,7 +62,7 @@ def EVAL_DEF():
     save(ENV)
     save(CONT)
     set_continue(DID_DEF_VAL)
-    goto_eval()
+    goto(EVAL_EXPR)
 
 def DID_DEF_VAL():
     restore(CONT)
@@ -74,7 +81,7 @@ def EVAL_ASS():
     save(ENV)
     save(CONT)
     set_continue(DID_ASS_VAL)
-    goto_eval()
+    goto(EVAL_EXPR)
 
 def DID_ASS_VAL():
     restore(CONT)
@@ -92,7 +99,7 @@ def EVAL_IF():
     _, condition, _, _ = fetch(EXPR)
     assign(EXPR, condition)
     set_continue(IF_DECIDE)
-    goto_eval()
+    goto(EVAL_EXPR)
 
 def IF_DECIDE():
     restore(EXPR)
@@ -106,12 +113,12 @@ def IF_DECIDE():
 def IF_THEN():
     _, _, consequence, _ = fetch(EXPR)
     assign(EXPR, consequence)
-    goto_eval()
+    goto(EVAL_EXPR)
 
 def IF_ELSE():
     _, _, _, alternative = fetch(EXPR)
     assign(EXPR, alternative)
-    goto_eval()
+    goto(EVAL_EXPR)
 
 ###
 
@@ -143,12 +150,12 @@ def MAP_EVAL():
 
     set_continue(DID_COMPOUND_FUNC)
 
-    goto_eval()
+    goto(EVAL_EXPR)
 
 def SIMPLE_FUNC():
     set_continue(DID_FUNC)
 
-    goto_eval()
+    goto(EVAL_EXPR)
 
 def DID_COMPOUND_FUNC():
     restore(UNEV)
@@ -182,7 +189,7 @@ def ARG_LOOP():
 def SIMPLE_ARG():
     set_continue(DID_SIMPLE_ARG)
 
-    goto_eval()
+    goto(EVAL_EXPR)
 
 def DID_SIMPLE_ARG():
     adjoin_arg()
@@ -205,7 +212,7 @@ def COMPOUND_ARG():
     save(UNEV)
 
     set_continue(ACC_ARG)
-    goto_eval()
+    goto(EVAL_EXPR)
 
 def ACC_ARG():
     restore(UNEV)
@@ -219,7 +226,7 @@ def ACC_ARG():
 def LAST_ARG():
     set_continue(DID_LAST_ARG)
 
-    goto_eval()
+    goto(EVAL_EXPR)
 
 def DID_LAST_ARG():
     restore(ARGL)
@@ -280,7 +287,7 @@ def EVAL_SEQ():
 
     set_continue(EVAL_SEQ_CONT)
 
-    goto_eval()
+    goto(EVAL_EXPR)
 
 def EVAL_SEQ_CONT():
     restore(ENV)
@@ -291,7 +298,7 @@ def EVAL_SEQ_CONT():
 def EVAL_SEQ_LAST():
     restore(CONT)
 
-    goto_eval()
+    goto(EVAL_EXPR)
 
 ###
 
@@ -313,7 +320,7 @@ def ALT_EVAL_SEQ():
 
     set_continue(ALT_EVAL_SEQ_CONT)
 
-    goto_eval()
+    goto(EVAL_EXPR)
 
 def ALT_EVAL_SEQ_CONT():
     restore(ENV)
@@ -389,7 +396,7 @@ def QSQ_SPLICE():
 
     set_continue(QSQ_DID_SPLICE)
 
-    goto_eval()
+    goto(EVAL_EXPR)
 
 def QSQ_DID_SPLICE():
     restore(CONT)
@@ -436,7 +443,7 @@ def DID_QUASIQUOTE():
 
     assign(EXPR, fetch(ARGL))
 
-    goto_eval()
+    goto(EVAL_EXPR)
 
 ###
 
@@ -465,11 +472,11 @@ def EVAL_MACRO():
     save(CONT)
 
     set_continue(DID_MACRO)
-    goto_eval()
+    goto(EVAL_EXPR)
 
 def DID_MACRO():
     restore(CONT)
     restore(ENV)
 
     assign(EXPR, fetch(VAL))
-    goto_eval()
+    goto(EVAL_EXPR)
