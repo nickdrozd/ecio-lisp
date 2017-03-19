@@ -15,11 +15,12 @@
 '''
 
 from reg import fetch, assign, EXPR, ENV, VAL, UNEV, ARGL
-from labels import UNBOUND
 from lib import LIBRARY, MACRO
 from prim import is_primitive
 from mem import ROOT, read_from_address, write_to_address, write_to_free_address
 
+
+UNBOUND = 'UNBOUND'
 
 def read_env_from_memory():
     "read env from memory"

@@ -1,7 +1,6 @@
 import fileio
 
 from reg import fetch, assign, CONT
-from labels import EVAL_EXP
 
 from stats import goto_stats
 
@@ -11,7 +10,7 @@ NO_INSTR = '"???"'
 
 @goto_stats
 def goto(label):
-    fileio.write_file(INSTR, label)
+    fileio.write_file(INSTR, _convert_label(label))
 
 def curr_instr():
     return fileio.read_file(INSTR, NO_INSTR)
@@ -22,10 +21,16 @@ def curr_instr():
 # (or PC, or whatever it really is)
 
 def goto_eval():
-    goto(EVAL_EXP)
+    goto('EVAL_EXP')
 
 def goto_continue():
     goto(fetch(CONT))
 
 def set_continue(label):
-    assign(CONT, label)
+    assign(CONT, _convert_label(label))
+
+def _convert_label(label):
+    try:
+        return label.__name__
+    except AttributeError:
+        return label

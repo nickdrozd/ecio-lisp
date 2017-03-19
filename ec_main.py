@@ -7,17 +7,15 @@ from instr import goto, goto_continue, goto_eval, set_continue
 from prim import is_primitive_func, apply_primitive_func
 from keywords import is_simple, is_unquoted, is_splice
 
-# pylint: disable=wildcard-import,unused-wildcard-import
-from labels import *
-
+# pylint: disable=invalid-name
 
 ###
 
-def eval_num():
+def EVAL_NUM():
     assign(VAL, fetch(EXPR))
     goto_continue()
 
-def eval_var():
+def EVAL_VAR():
     assign(VAL, lookup_expr())
 
     if is_unbound(VAL):
@@ -26,17 +24,17 @@ def eval_var():
 
     goto_continue()
 
-def unbound():
-    goto(DONE)
+def UNBOUND():
+    goto('DONE')
 
-def eval_quote():
+def EVAL_QUOTE():
     _, text = fetch(EXPR)
     assign(VAL, text)
     goto_continue()
 
 ###
 
-def eval_lambda():
+def EVAL_LAMBDA():
     _, params, *body = fetch(EXPR)
     assign(UNEV, params)
     assign(EXPR, body)
@@ -49,7 +47,7 @@ def eval_lambda():
 
 ###
 
-def eval_def():
+def EVAL_DEF():
     _, var, val = fetch(EXPR)
     assign(UNEV, var)
     assign(EXPR, val)
@@ -59,7 +57,7 @@ def eval_def():
     set_continue(DID_DEF_VAL)
     goto_eval()
 
-def did_def_val():
+def DID_DEF_VAL():
     restore(CONT)
     restore(ENV)
     restore(UNEV)
@@ -68,7 +66,7 @@ def did_def_val():
 
 ###
 
-def eval_ass():
+def EVAL_ASS():
     _, var, val = fetch(EXPR)
     assign(UNEV, var)
     assign(EXPR, val)
@@ -78,7 +76,7 @@ def eval_ass():
     set_continue(DID_ASS_VAL)
     goto_eval()
 
-def did_ass_val():
+def DID_ASS_VAL():
     restore(CONT)
     restore(ENV)
     restore(UNEV)
@@ -87,7 +85,7 @@ def did_ass_val():
 
 ###
 
-def eval_if():
+def EVAL_IF():
     save(ENV)
     save(CONT)
     save(EXPR)
@@ -96,7 +94,7 @@ def eval_if():
     set_continue(IF_DECIDE)
     goto_eval()
 
-def if_decide():
+def IF_DECIDE():
     restore(EXPR)
     restore(CONT)
     restore(ENV)
@@ -105,19 +103,19 @@ def if_decide():
     else:
         goto(IF_ELSE)
 
-def if_then():
+def IF_THEN():
     _, _, consequence, _ = fetch(EXPR)
     assign(EXPR, consequence)
     goto_eval()
 
-def if_else():
+def IF_ELSE():
     _, _, _, alternative = fetch(EXPR)
     assign(EXPR, alternative)
     goto_eval()
 
 ###
 
-def eval_begin():
+def EVAL_BEGIN():
     _, *body = fetch(EXPR)
     assign(UNEV, body)
     save(CONT)
@@ -125,12 +123,12 @@ def eval_begin():
 
 ###
 
-def eval_func():
+def EVAL_FUNC():
     save(CONT)
 
     goto(MAP_EVAL)
 
-def map_eval():
+def MAP_EVAL():
     func, *args = fetch(EXPR)
 
     assign(EXPR, func)
@@ -147,18 +145,18 @@ def map_eval():
 
     goto_eval()
 
-def simple_func():
+def SIMPLE_FUNC():
     set_continue(DID_FUNC)
 
     goto_eval()
 
-def did_compound_func():
+def DID_COMPOUND_FUNC():
     restore(UNEV)
     restore(ENV)
 
     goto(DID_FUNC)
 
-def did_func():
+def DID_FUNC():
     result = fetch(VAL)
 
     assign(ARGL, [result])
@@ -169,7 +167,7 @@ def did_func():
 
     goto(ARG_LOOP)
 
-def arg_loop():
+def ARG_LOOP():
     first, *rest = fetch(UNEV)
 
     assign(EXPR, first)
@@ -181,12 +179,12 @@ def arg_loop():
 
     goto(COMPOUND_ARG)
 
-def simple_arg():
+def SIMPLE_ARG():
     set_continue(DID_SIMPLE_ARG)
 
     goto_eval()
 
-def did_simple_arg():
+def DID_SIMPLE_ARG():
     adjoin_arg()
 
     if not fetch(UNEV):
@@ -195,7 +193,7 @@ def did_simple_arg():
 
     goto(ARG_LOOP)
 
-def compound_arg():
+def COMPOUND_ARG():
     save(ARGL)
 
     # 'evlis' tail recursion
@@ -209,7 +207,7 @@ def compound_arg():
     set_continue(ACC_ARG)
     goto_eval()
 
-def acc_arg():
+def ACC_ARG():
     restore(UNEV)
     restore(ENV)
     restore(ARGL)
@@ -218,12 +216,12 @@ def acc_arg():
 
     goto(ARG_LOOP)
 
-def last_arg():
+def LAST_ARG():
     set_continue(DID_LAST_ARG)
 
     goto_eval()
 
-def did_last_arg():
+def DID_LAST_ARG():
     restore(ARGL)
 
     adjoin_arg()
@@ -232,7 +230,7 @@ def did_last_arg():
 
 ###
 
-def apply_func():
+def APPLY_FUNC():
     func, *args = fetch(ARGL)
 
     assign(FUNC, func)
@@ -244,14 +242,14 @@ def apply_func():
     else:
         goto(APPLY_COMPOUND)
 
-def apply_primitive():
+def APPLY_PRIMITIVE():
     apply_primitive_func()
 
     restore(CONT)
 
     goto_continue()
 
-def apply_compound():
+def APPLY_COMPOUND():
     # this needs to agree with eval_lambda
     env, params, body = fetch(FUNC)
 
@@ -265,7 +263,7 @@ def apply_compound():
 
 ###
 
-def eval_seq():
+def EVAL_SEQ():
     first, *rest = fetch(UNEV)
 
     assign(EXPR, first)
@@ -284,20 +282,20 @@ def eval_seq():
 
     goto_eval()
 
-def eval_seq_cont():
+def EVAL_SEQ_CONT():
     restore(ENV)
     restore(UNEV)
 
     goto(EVAL_SEQ)
 
-def eval_seq_last():
+def EVAL_SEQ_LAST():
     restore(CONT)
 
     goto_eval()
 
 ###
 
-def alt_eval_seq():
+def ALT_EVAL_SEQ():
     exps = fetch(UNEV)
 
     # if no_exps...
@@ -317,19 +315,19 @@ def alt_eval_seq():
 
     goto_eval()
 
-def alt_eval_seq_cont():
+def ALT_EVAL_SEQ_CONT():
     restore(ENV)
     restore(UNEV)
 
     goto(ALT_EVAL_SEQ)
 
-def alt_eval_seq_end():
+def ALT_EVAL_SEQ_END():
     restore(CONT)
     goto_continue()
 
 ###
 
-def eval_quasiquote():
+def EVAL_QUASIQUOTE():
     _, text = fetch(EXPR)
 
     if is_simple(text):
@@ -344,7 +342,7 @@ def eval_quasiquote():
 
     goto(QSQ_LOOP)
 
-def qsq_loop():
+def QSQ_LOOP():
     first, *rest = fetch(EXPR)
 
     assign(UNEV, rest)
@@ -364,14 +362,14 @@ def qsq_loop():
 
     goto(QSQ_SUBLIST)
 
-def qsq_simple():
+def QSQ_SIMPLE():
     assign(VAL, ['quote', fetch(EXPR)])
 
     adjoin_arg()
 
     goto(QSQ_CHECK_REST)
 
-def qsq_unquoted():
+def QSQ_UNQUOTED():
     _, text = fetch(EXPR)
 
     assign(VAL, text)
@@ -380,7 +378,7 @@ def qsq_unquoted():
 
     goto(QSQ_CHECK_REST)
 
-def qsq_splice():
+def QSQ_SPLICE():
     _, text = fetch(EXPR)
 
     assign(EXPR, text)
@@ -393,7 +391,7 @@ def qsq_splice():
 
     goto_eval()
 
-def qsq_did_splice():
+def QSQ_DID_SPLICE():
     restore(CONT)
     restore(UNEV)
     restore(ARGL)
@@ -402,7 +400,7 @@ def qsq_did_splice():
 
     goto(QSQ_CHECK_REST)
 
-def qsq_sublist():
+def QSQ_SUBLIST():
     save(ARGL)
     save(UNEV)
     save(CONT)
@@ -413,7 +411,7 @@ def qsq_sublist():
 
     goto(QSQ_LOOP)
 
-def did_qsq_sublist():
+def DID_QSQ_SUBLIST():
     assign(VAL, fetch(ARGL))
 
     restore(CONT)
@@ -424,7 +422,7 @@ def did_qsq_sublist():
 
     goto(QSQ_CHECK_REST)
 
-def qsq_check_rest():
+def QSQ_CHECK_REST():
     if not fetch(UNEV):
         goto_continue()
         return
@@ -433,7 +431,7 @@ def qsq_check_rest():
 
     goto(QSQ_LOOP)
 
-def did_quasiquote():
+def DID_QUASIQUOTE():
     restore(CONT)
 
     assign(EXPR, fetch(ARGL))
@@ -442,13 +440,13 @@ def did_quasiquote():
 
 ###
 
-def eval_defmacro():
+def EVAL_DEFMACRO():
     define_macro()
     goto_continue()
 
 ###
 
-def eval_macro():
+def EVAL_MACRO():
     macro, *args = fetch(EXPR)
 
     assign(ARGL, args)
@@ -469,7 +467,7 @@ def eval_macro():
     set_continue(DID_MACRO)
     goto_eval()
 
-def did_macro():
+def DID_MACRO():
     restore(CONT)
     restore(ENV)
 
