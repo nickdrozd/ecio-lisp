@@ -27,6 +27,28 @@ def run_benchmark():
       (fibonacci {}))
 '''
 
+    mutative_fib = '''
+    (begin
+      (def fibonacci
+        (λ (n)
+          (def a 0)
+          (def b 1)
+          (def count 0)
+          (def loop
+            (λ ()
+              (if (= count n)
+                  a
+                  (begin
+                    (def temp b)
+                    (set! b (_+ a b))
+                    (set! a temp)
+                    (set! count (_+ count 1))
+                    (loop)))))
+          (loop)))
+      (fibonacci {}))
+'''
+
+
     fib_vals = {
         0: 0,
         1: 1,
@@ -44,6 +66,7 @@ def run_benchmark():
     functions = {
         'RECURSIVE': recursive_fib,
         'ITERATIVE': iterative_fib,
+        'MUTATIVE': mutative_fib,
     }
 
     for function_name, function in functions.items():
