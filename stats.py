@@ -9,10 +9,21 @@ import time
 
 def display_stats(stats_flag=0):
     if stats_flag:
+        divider()
+
+        # evaluator stats
         display_stack_stats()
+        display_fetch_stats()
         display_label_stats()
+        display_dispatch_stats()
+
+        divider()
+
+        # system stats
         display_read_stats()
         display_run_time()
+
+        divider()
 
     reset_stats()
 
@@ -20,12 +31,19 @@ def reset_stats():
     for counter in COUNTERS:
         COUNTERS[counter] = 0
 
+def divider():
+    print('-' * 10)
+
 COUNTERS = {
     'number_of_saves': 0,
     'curr_stack_depth': 0,
     'max_stack_depth': 0,
 
+    'fetch_count': 0,
+
     'labels_passed': 0,
+
+    'syntax_checks': 0,
 
     'read_count': 0,
 }
@@ -106,3 +124,31 @@ def display_run_time():
     run_time = COUNTERS['run_time']
 
     print('Run-time:', run_time)
+
+# dispatch stats
+
+def dispatch_stats(dispatch_func):
+    def dispatch_wrapper(expr):
+        COUNTERS['syntax_checks'] += 1
+        return dispatch_func(expr)
+
+    return dispatch_wrapper
+
+def display_dispatch_stats():
+    syntax_checks = COUNTERS['syntax_checks']
+
+    print('Syntax checks:', syntax_checks)
+
+# register stats
+
+def fetch_stats(fetch_func):
+    def fetch_wrapper(reg):
+        COUNTERS['fetch_count'] += 1
+        return fetch_func(reg)
+
+    return fetch_wrapper
+
+def display_fetch_stats():
+    fetches = COUNTERS['fetch_count']
+
+    print('Total fetches:', fetches)

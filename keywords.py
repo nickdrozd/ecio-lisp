@@ -5,9 +5,20 @@
     But macros make it possible to alter the syntax at run-time,
     meaning that keyword dispatch has to be cognizant of the mutable
     state of the machine!
+
+    ###
+
+    Is it "cheating" to include keyword_dispatch? It would be trivial
+    to unroll it into a big ugly list of branch-if statements, so it
+    doesn't really add any expressive power. Still, to mollify the
+    skeptic, keyword_dispatch can be imagined as a piece of specialized
+    hardware. Further, it can be stipulated that its use is relatively
+    expensive, thereby gaining some advantage for analyze-interpretation.
 '''
 
 from env import is_macro
+
+from stats import dispatch_stats
 
 
 DEFINE_KEYS = 'define', 'def'
@@ -30,8 +41,7 @@ DEFMACRO_KEYS = 'defmacro', 'defmac'
 
 ###
 
-# without labels / switch, are bare string necessary?
-
+@dispatch_stats
 def keyword_dispatch(expr):
     if is_var(expr):
         return 'EVAL_VAR'
