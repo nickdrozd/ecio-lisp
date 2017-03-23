@@ -646,6 +646,7 @@ Which change was more impactful?
 
 Note that the run times are actually higher than before. The price of the increase in stack efficiency is a greater number of labels passed, and in this system jumping to a label is not fast.
 
+
     (begin
       (def fibonacci
         (λ (n)
@@ -657,91 +658,309 @@ Note that the run times are actually higher than before. The price of the increa
 
 n = 0
 
+----------
 Total saves: 11
 Max stack depth: 6
+Total fetches: 100
 Labels passed: 53
+Syntax checks: 12
+----------
 Total file reads: 227
-Run-time: 0.06679940223693848
+Run-time: 0.0689857006072998
+----------
 
 n = 1
 
+----------
 Total saves: 11
 Max stack depth: 6
+Total fetches: 100
 Labels passed: 53
+Syntax checks: 12
+----------
 Total file reads: 227
-Run-time: 0.0676124095916748
+Run-time: 0.06718897819519043
+----------
 
 n = 2
 
+----------
 Total saves: 30
 Max stack depth: 8
+Total fetches: 328
 Labels passed: 185
+Syntax checks: 37
+----------
 Total file reads: 758
-Run-time: 0.22137761116027832
+Run-time: 0.22564291954040527
+----------
 
 n = 3
 
+----------
 Total saves: 49
 Max stack depth: 12
+Total fetches: 556
 Labels passed: 317
+Syntax checks: 62
+----------
 Total file reads: 1289
-Run-time: 0.3810606002807617
+Run-time: 0.3939206600189209
+----------
 
 n = 4
 
+----------
 Total saves: 87
 Max stack depth: 16
+Total fetches: 1012
 Labels passed: 581
+Syntax checks: 112
+----------
 Total file reads: 2351
-Run-time: 0.7017796039581299
+Run-time: 0.7222328186035156
+----------
 
 n = 5
 
+----------
 Total saves: 144
 Max stack depth: 20
+Total fetches: 1696
 Labels passed: 977
+Syntax checks: 187
+----------
 Total file reads: 3944
-Run-time: 1.1670665740966797
+Run-time: 1.2938480377197266
+----------
 
 n = 6
 
+----------
 Total saves: 239
 Max stack depth: 24
+Total fetches: 2836
 Labels passed: 1637
+Syntax checks: 312
+----------
 Total file reads: 6599
-Run-time: 1.98274564743042
+Run-time: 2.1581878662109375
+----------
 
 n = 7
 
+----------
 Total saves: 391
 Max stack depth: 28
+Total fetches: 4660
 Labels passed: 2693
+Syntax checks: 512
+----------
 Total file reads: 10847
-Run-time: 3.307210683822632
+Run-time: 3.365889310836792
+----------
 
 n = 8
 
+----------
 Total saves: 638
 Max stack depth: 32
+Total fetches: 7624
 Labels passed: 4409
+Syntax checks: 837
+----------
 Total file reads: 17750
-Run-time: 5.5228917598724365
+Run-time: 5.612431526184082
+----------
 
 n = 9
 
+----------
 Total saves: 1037
 Max stack depth: 36
+Total fetches: 12412
 Labels passed: 7181
+Syntax checks: 1362
+----------
 Total file reads: 28901
-Run-time: 9.243800640106201
+Run-time: 9.38938307762146
+----------
 
 n = 10
 
+----------
 Total saves: 1683
 Max stack depth: 40
+Total fetches: 20164
 Labels passed: 11669
+Syntax checks: 2212
+----------
 Total file reads: 46955
-Run-time: 15.641118049621582
+Run-time: 15.8973548412323
+----------
+
+
+    (begin
+      (def fibonacci
+        (λ (n)
+          (def a 0)
+          (def b 1)
+          (def count 0)
+          (def loop
+            (λ ()
+              (if (= count n)
+                  a
+                  (begin
+                    (def temp b)
+                    (set! b (_+ a b))
+                    (set! a temp)
+                    (set! count (_+ count 1))
+                    (loop)))))
+          (loop)))
+      (fibonacci {}))
+
+n = 0
+
+----------
+Total saves: 32
+Max stack depth: 6
+Total fetches: 203
+Labels passed: 92
+Syntax checks: 22
+----------
+Total file reads: 445
+Run-time: 0.1605210304260254
+----------
+
+n = 1
+
+----------
+Total saves: 60
+Max stack depth: 7
+Total fetches: 411
+Labels passed: 192
+Syntax checks: 44
+----------
+Total file reads: 913
+Run-time: 0.3141133785247803
+----------
+
+n = 2
+
+----------
+Total saves: 88
+Max stack depth: 7
+Total fetches: 619
+Labels passed: 292
+Syntax checks: 66
+----------
+Total file reads: 1381
+Run-time: 0.49139904975891113
+----------
+
+n = 3
+
+----------
+Total saves: 116
+Max stack depth: 7
+Total fetches: 827
+Labels passed: 392
+Syntax checks: 88
+----------
+Total file reads: 1849
+Run-time: 0.6387221813201904
+----------
+
+n = 4
+
+----------
+Total saves: 144
+Max stack depth: 7
+Total fetches: 1035
+Labels passed: 492
+Syntax checks: 110
+----------
+Total file reads: 2317
+Run-time: 0.7856476306915283
+----------
+
+n = 5
+
+----------
+Total saves: 172
+Max stack depth: 7
+Total fetches: 1243
+Labels passed: 592
+Syntax checks: 132
+----------
+Total file reads: 2785
+Run-time: 0.93282151222229
+----------
+
+n = 6
+
+----------
+Total saves: 200
+Max stack depth: 7
+Total fetches: 1451
+Labels passed: 692
+Syntax checks: 154
+----------
+Total file reads: 3253
+Run-time: 1.0928044319152832
+----------
+
+n = 7
+
+----------
+Total saves: 228
+Max stack depth: 7
+Total fetches: 1659
+Labels passed: 792
+Syntax checks: 176
+----------
+Total file reads: 3721
+Run-time: 1.2560434341430664
+----------
+
+n = 8
+
+----------
+Total saves: 256
+Max stack depth: 7
+Total fetches: 1867
+Labels passed: 892
+Syntax checks: 198
+----------
+Total file reads: 4189
+Run-time: 1.4225411415100098
+----------
+
+n = 9
+
+----------
+Total saves: 284
+Max stack depth: 7
+Total fetches: 2075
+Labels passed: 992
+Syntax checks: 220
+----------
+Total file reads: 4657
+Run-time: 1.562903642654419
+----------
+
+n = 10
+
+----------
+Total saves: 312
+Max stack depth: 7
+Total fetches: 2283
+Labels passed: 1092
+Syntax checks: 242
+----------
+Total file reads: 5125
+Run-time: 1.7182204723358154
+----------
 
 
     (begin
@@ -757,89 +976,768 @@ Run-time: 15.641118049621582
 
 n = 0
 
+----------
 Total saves: 17
 Max stack depth: 6
+Total fetches: 164
 Labels passed: 86
+Syntax checks: 19
+----------
 Total file reads: 371
-Run-time: 0.11427164077758789
+Run-time: 0.1252434253692627
+----------
 
 n = 1
 
+----------
 Total saves: 28
 Max stack depth: 6
+Total fetches: 314
 Labels passed: 170
+Syntax checks: 35
+----------
 Total file reads: 715
-Run-time: 0.2171478271484375
+Run-time: 0.23515987396240234
+----------
 
 n = 2
 
+----------
 Total saves: 39
 Max stack depth: 6
+Total fetches: 464
 Labels passed: 254
+Syntax checks: 51
+----------
 Total file reads: 1059
-Run-time: 0.31978797912597656
+Run-time: 0.339127779006958
+----------
 
 n = 3
 
+----------
 Total saves: 50
 Max stack depth: 6
+Total fetches: 614
 Labels passed: 338
+Syntax checks: 67
+----------
 Total file reads: 1403
-Run-time: 0.40293073654174805
+Run-time: 0.42785000801086426
+----------
 
 n = 4
 
+----------
 Total saves: 61
 Max stack depth: 6
+Total fetches: 764
 Labels passed: 422
+Syntax checks: 83
+----------
 Total file reads: 1747
-Run-time: 0.49988508224487305
+Run-time: 0.5416491031646729
+----------
 
 n = 5
 
+----------
 Total saves: 72
 Max stack depth: 6
+Total fetches: 914
 Labels passed: 506
+Syntax checks: 99
+----------
 Total file reads: 2091
-Run-time: 0.6033778190612793
+Run-time: 0.6371340751647949
+----------
 
 n = 6
 
+----------
 Total saves: 83
 Max stack depth: 6
+Total fetches: 1064
 Labels passed: 590
+Syntax checks: 115
+----------
 Total file reads: 2435
-Run-time: 0.6923844814300537
+Run-time: 0.7419490814208984
+----------
 
 n = 7
 
+----------
 Total saves: 94
 Max stack depth: 6
+Total fetches: 1214
 Labels passed: 674
+Syntax checks: 131
+----------
 Total file reads: 2779
-Run-time: 0.7959372997283936
+Run-time: 0.8042550086975098
+----------
 
 n = 8
 
+----------
 Total saves: 105
 Max stack depth: 6
+Total fetches: 1364
 Labels passed: 758
+Syntax checks: 147
+----------
 Total file reads: 3123
-Run-time: 0.89408278465271
+Run-time: 0.8877136707305908
+----------
 
 n = 9
 
+----------
 Total saves: 116
 Max stack depth: 6
+Total fetches: 1514
 Labels passed: 842
+Syntax checks: 163
+----------
 Total file reads: 3467
-Run-time: 0.9927518367767334
+Run-time: 1.0174803733825684
+----------
 
 n = 10
 
+----------
 Total saves: 127
 Max stack depth: 6
+Total fetches: 1664
 Labels passed: 926
+Syntax checks: 179
+----------
 Total file reads: 3811
-Run-time: 1.0948302745819092
+Run-time: 1.0906903743743896
+----------
+
+
+
+
+
+
+
+
+
+
+
+03/22/17
+
+The explicit control evaulator has been reimplemented using the analyze-execute model from SICP 4.1.7. It has the optimizations of the eval-apply evaluator, but it hasn't been optimized for the analyze-execute specific features (there are plenty of opportunities).
+
+    (begin
+      (def fibonacci
+        (λ (n)
+          (def a 0)
+          (def b 1)
+          (def count 0)
+          (def loop
+            (λ ()
+              (if (= count n)
+                  a
+                  (begin
+                    (def temp b)
+                    (set! b (_+ a b))
+                    (set! a temp)
+                    (set! count (_+ count 1))
+                    (loop)))))
+          (loop)))
+      (fibonacci {}))
+
+n = 0
+
+----------
+Total saves: 106
+Max stack depth: 31
+Total fetches: 672
+Labels passed: 317
+Syntax checks: 39
+----------
+Total file reads: 1441
+Run-time: 0.6043035984039307
+----------
+
+n = 1
+
+----------
+Total saves: 141
+Max stack depth: 31
+Total fetches: 909
+Labels passed: 419
+Syntax checks: 39
+----------
+Total file reads: 1945
+Run-time: 0.7813854217529297
+----------
+
+n = 2
+
+----------
+Total saves: 176
+Max stack depth: 31
+Total fetches: 1146
+Labels passed: 521
+Syntax checks: 39
+----------
+Total file reads: 2449
+Run-time: 0.9927103519439697
+----------
+
+n = 3
+
+----------
+Total saves: 211
+Max stack depth: 31
+Total fetches: 1383
+Labels passed: 623
+Syntax checks: 39
+----------
+Total file reads: 2953
+Run-time: 1.1739189624786377
+----------
+
+n = 4
+
+----------
+Total saves: 246
+Max stack depth: 31
+Total fetches: 1620
+Labels passed: 725
+Syntax checks: 39
+----------
+Total file reads: 3457
+Run-time: 1.4375619888305664
+----------
+
+n = 5
+
+----------
+Total saves: 281
+Max stack depth: 31
+Total fetches: 1857
+Labels passed: 827
+Syntax checks: 39
+----------
+Total file reads: 3961
+Run-time: 1.8285324573516846
+----------
+
+n = 6
+
+----------
+Total saves: 316
+Max stack depth: 31
+Total fetches: 2094
+Labels passed: 929
+Syntax checks: 39
+----------
+Total file reads: 4465
+Run-time: 1.9753153324127197
+----------
+
+n = 7
+
+----------
+Total saves: 351
+Max stack depth: 31
+Total fetches: 2331
+Labels passed: 1031
+Syntax checks: 39
+----------
+Total file reads: 4969
+Run-time: 2.2253479957580566
+----------
+
+n = 8
+
+----------
+Total saves: 386
+Max stack depth: 31
+Total fetches: 2568
+Labels passed: 1133
+Syntax checks: 39
+----------
+Total file reads: 5473
+Run-time: 2.1752994060516357
+----------
+
+n = 9
+
+----------
+Total saves: 421
+Max stack depth: 31
+Total fetches: 2805
+Labels passed: 1235
+Syntax checks: 39
+----------
+Total file reads: 5977
+Run-time: 2.5058350563049316
+----------
+
+n = 10
+
+----------
+Total saves: 456
+Max stack depth: 31
+Total fetches: 3042
+Labels passed: 1337
+Syntax checks: 39
+----------
+Total file reads: 6481
+Run-time: 2.6740076541900635
+----------
+
+
+    (begin
+      (def fibonacci
+        (λ (n)
+          (if (< n 2)
+              n
+              (_+ (fibonacci (_- n 1))
+                  (fibonacci (_- n 2))))))
+      (fibonacci {}))
+
+n = 0
+
+----------
+Total saves: 49
+Max stack depth: 24
+Total fetches: 378
+Labels passed: 210
+Syntax checks: 26
+----------
+Total file reads: 862
+Run-time: 0.2993807792663574
+----------
+
+n = 1
+
+----------
+Total saves: 49
+Max stack depth: 24
+Total fetches: 378
+Labels passed: 210
+Syntax checks: 26
+----------
+Total file reads: 862
+Run-time: 0.30638551712036133
+----------
+
+n = 2
+
+----------
+Total saves: 75
+Max stack depth: 24
+Total fetches: 639
+Labels passed: 345
+Syntax checks: 26
+----------
+Total file reads: 1432
+Run-time: 0.476668119430542
+----------
+
+n = 3
+
+----------
+Total saves: 101
+Max stack depth: 24
+Total fetches: 900
+Labels passed: 480
+Syntax checks: 26
+----------
+Total file reads: 2002
+Run-time: 0.682269811630249
+----------
+
+n = 4
+
+----------
+Total saves: 153
+Max stack depth: 24
+Total fetches: 1422
+Labels passed: 750
+Syntax checks: 26
+----------
+Total file reads: 3142
+Run-time: 1.0721426010131836
+----------
+
+n = 5
+
+----------
+Total saves: 231
+Max stack depth: 25
+Total fetches: 2205
+Labels passed: 1155
+Syntax checks: 26
+----------
+Total file reads: 4852
+Run-time: 1.7221033573150635
+----------
+
+n = 6
+
+----------
+Total saves: 361
+Max stack depth: 30
+Total fetches: 3510
+Labels passed: 1830
+Syntax checks: 26
+----------
+Total file reads: 7702
+Run-time: 2.796583652496338
+----------
+
+n = 7
+
+----------
+Total saves: 569
+Max stack depth: 35
+Total fetches: 5598
+Labels passed: 2910
+Syntax checks: 26
+----------
+Total file reads: 12262
+Run-time: 4.753705978393555
+----------
+
+n = 8
+
+----------
+Total saves: 907
+Max stack depth: 40
+Total fetches: 8991
+Labels passed: 4665
+Syntax checks: 26
+----------
+Total file reads: 19672
+Run-time: 7.762490510940552
+----------
+
+n = 9
+
+----------
+Total saves: 1453
+Max stack depth: 45
+Total fetches: 14472
+Labels passed: 7500
+Syntax checks: 26
+----------
+Total file reads: 31642
+Run-time: 12.251363515853882
+----------
+
+n = 10
+
+----------
+Total saves: 2337
+Max stack depth: 50
+Total fetches: 23346
+Labels passed: 12090
+Syntax checks: 26
+----------
+Total file reads: 51022
+Run-time: 20.593132257461548
+----------
+
+
+    (begin
+      (def fibonacci
+        (λ (n)
+          (def loop
+            (λ (a b count)
+               (if (= count n)
+                   a
+                   (loop b (_+ a b) (_+ count 1)))))
+          (loop 0 1 0)))
+      (fibonacci {}))
+
+n = 0
+
+----------
+Total saves: 61
+Max stack depth: 28
+Total fetches: 493
+Labels passed: 265
+Syntax checks: 30
+----------
+Total file reads: 1105
+Run-time: 0.3806135654449463
+----------
+
+n = 1
+
+----------
+Total saves: 76
+Max stack depth: 28
+Total fetches: 661
+Labels passed: 351
+Syntax checks: 30
+----------
+Total file reads: 1471
+Run-time: 0.5086367130279541
+----------
+
+n = 2
+
+----------
+Total saves: 91
+Max stack depth: 28
+Total fetches: 829
+Labels passed: 437
+Syntax checks: 30
+----------
+Total file reads: 1837
+Run-time: 0.6384379863739014
+----------
+
+n = 3
+
+----------
+Total saves: 106
+Max stack depth: 28
+Total fetches: 997
+Labels passed: 523
+Syntax checks: 30
+----------
+Total file reads: 2203
+Run-time: 0.7351176738739014
+----------
+
+n = 4
+
+----------
+Total saves: 121
+Max stack depth: 28
+Total fetches: 1165
+Labels passed: 609
+Syntax checks: 30
+----------
+Total file reads: 2569
+Run-time: 0.8446676731109619
+----------
+
+n = 5
+
+----------
+Total saves: 136
+Max stack depth: 28
+Total fetches: 1333
+Labels passed: 695
+Syntax checks: 30
+----------
+Total file reads: 2935
+Run-time: 0.9845635890960693
+----------
+
+n = 6
+
+----------
+Total saves: 151
+Max stack depth: 28
+Total fetches: 1501
+Labels passed: 781
+Syntax checks: 30
+----------
+Total file reads: 3301
+Run-time: 1.1039810180664062
+----------
+
+n = 7
+
+----------
+Total saves: 166
+Max stack depth: 28
+Total fetches: 1669
+Labels passed: 867
+Syntax checks: 30
+----------
+Total file reads: 3667
+Run-time: 1.2359495162963867
+----------
+
+n = 8
+
+----------
+Total saves: 181
+Max stack depth: 28
+Total fetches: 1837
+Labels passed: 953
+Syntax checks: 30
+----------
+Total file reads: 4033
+Run-time: 1.4266352653503418
+----------
+
+n = 9
+
+----------
+Total saves: 196
+Max stack depth: 28
+Total fetches: 2005
+Labels passed: 1039
+Syntax checks: 30
+----------
+Total file reads: 4399
+Run-time: 1.6152348518371582
+----------
+
+n = 10
+
+----------
+Total saves: 211
+Max stack depth: 28
+Total fetches: 2173
+Labels passed: 1125
+Syntax checks: 30
+----------
+Total file reads: 4765
+Run-time: 1.7288978099822998
+----------
+
+
+
+
+
+
+
+03/22/17
+
+For comparison between the eval-apply and analyze-execute evaluators, here are the same fibonacci functions, but with (fibonacci 10) being executed twice after being defined.
+
+
+    (begin
+      (def fibonacci
+        (λ (n)
+          (if (< n 2)
+              n
+              (_+ (fibonacci (_- n 1))
+                  (fibonacci (_- n 2))))))
+      (fibonacci 10)
+      (fibonacci 10))
+
+ANALYZE
+
+----------
+Total saves: 4639
+Max stack depth: 53
+Total fetches: 46436
+Labels passed: 24032
+Syntax checks: 29
+----------
+Total file reads: 101448
+Run-time: 44.38411593437195
+----------
+
+EVAL
+
+----------
+Total saves: 3362
+Max stack depth: 43
+Total fetches: 40304
+Labels passed: 23328
+Syntax checks: 4421
+----------
+Total file reads: 93859
+Run-time: 35.1933479309082
+----------
+
+
+    (begin
+      (def fibonacci
+        (λ (n)
+          (def a 0)
+          (def b 1)
+          (def count 0)
+          (def loop
+            (λ ()
+              (if (= count n)
+                  a
+                  (begin
+                    (def temp b)
+                    (set! b (_+ a b))
+                    (set! a temp)
+                    (set! count (_+ count 1))
+                    (loop)))))
+          (loop)))
+      (fibonacci 10)
+      (fibonacci 10))
+
+ANALYZE
+
+----------
+Total saves: 846
+Max stack depth: 31
+Total fetches: 5657
+Labels passed: 2461
+Syntax checks: 42
+----------
+Total file reads: 12035
+Run-time: 5.146688222885132
+----------
+
+EVAL
+
+----------
+Total saves: 620
+Max stack depth: 10
+Total fetches: 4542
+Labels passed: 2174
+Syntax checks: 481
+----------
+Total file reads: 10199
+Run-time: 3.4945788383483887
+----------
+
+    (begin
+      (def fibonacci
+        (λ (n)
+          (def loop
+            (λ (a b count)
+               (if (= count n)
+                   a
+                   (loop b (_+ a b) (_+ count 1)))))
+          (loop 0 1 0)))
+      (fibonacci 10)
+      (fibonacci 10))
+
+ANALYZE
+
+----------
+Total saves: 383
+Max stack depth: 28
+Total fetches: 4047
+Labels passed: 2080
+Syntax checks: 33
+----------
+Total file reads: 8844
+Run-time: 3.3052279949188232
+----------
+
+EVAL
+
+----------
+Total saves: 250
+Max stack depth: 9
+Total fetches: 3304
+Labels passed: 1842
+Syntax checks: 355
+----------
+Total file reads: 7571
+Run-time: 2.2749998569488525
+----------
+
+
+
+
+
+
+
+
 
