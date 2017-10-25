@@ -11,28 +11,35 @@ PREFIX = '__MEM_'
 ROOT_INDEX = 0
 ROOT = PREFIX + str(ROOT_INDEX)
 
+
 def load_memory():
     return fileio.read_file(MEM, default=EMPTY_MEM)
+
 
 def write_memory(data):
     fileio.write_file(MEM, data)
 
+
 def read_from_address(address):
     memory = load_memory()
     return memory[address]
+
 
 def write_to_address(data, address):
     memory = load_memory()
     memory[address] = data
     write_memory(memory)
 
+
 def write_to_free_address(data):
     address = next_free_address(load_memory())
     write_to_address(data, address)
     return address
 
+
 def clear_memory():
     write_memory(EMPTY_MEM)
+
 
 # this is a little dramatic
 def next_free_address(memory_space):
@@ -41,7 +48,7 @@ def next_free_address(memory_space):
         for address in memory_space.keys()
     ]
 
-    if len(used_addresses) == 0:
+    if not used_addresses:
         return convert_num_address(0)
 
     # if every address from 0 through n are used,
@@ -55,8 +62,10 @@ def next_free_address(memory_space):
 
     return convert_num_address(address_cap)
 
+
 def convert_num_address(num_address):
     return PREFIX + str(num_address)
+
 
 def convert_str_address(str_address):
     return int(str_address[len(PREFIX):])

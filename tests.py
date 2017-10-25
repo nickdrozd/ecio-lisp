@@ -9,8 +9,8 @@ from mem import load_memory, write_memory, ROOT
 
 class EcioTestCase(unittest.TestCase):
     def setUp(self):
-        pass
-        # initialize()
+        self.result = None
+        self.memory = None
 
 
 class TestRun(EcioTestCase):
@@ -312,7 +312,6 @@ class TestGarbageCollector(EcioTestCase):
         self.assert_null_root_enclosure()
         self.assert_address_count(7)
         self.assert_root_definition_count(5)
-
 
     def assert_address_count(self, expected):
         actual_address_count = len(self.memory.keys())

@@ -2,6 +2,7 @@ import json
 
 from stats import read_stats
 
+
 @read_stats
 def read_file(file_name, default='"?"'):
     try:
@@ -16,6 +17,7 @@ def read_file(file_name, default='"?"'):
     file.close()
 
     return contents
+
 
 def write_file(file_name, data, indent=4):
     with open(file_name, 'w+') as file:

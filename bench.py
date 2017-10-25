@@ -48,7 +48,6 @@ def run_benchmark():
       (fibonacci {}))
 '''
 
-
     fib_vals = {
         0: 0,
         1: 1,

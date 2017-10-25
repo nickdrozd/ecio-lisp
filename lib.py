@@ -3,7 +3,7 @@
 MACRO = '__MACRO'
 
 LIBRARY = {
-            MACRO : [],
+            MACRO: [],
             "*": [
                 "__MEM_0",
                 "nums",

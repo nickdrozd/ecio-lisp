@@ -22,15 +22,18 @@ from mem import ROOT, read_from_address, write_to_address, write_to_free_address
 
 UNBOUND = 'UNBOUND'
 
+
 def read_env_from_memory():
     "read env from memory"
     address = fetch(ENV)
     return read_from_address(address), address
 
+
 def write_env_to_new_memory(env):
     "write env to memory at the earliest available address"
     address = write_to_free_address(env)
     assign(ENV, address)
+
 
 def lookup_expr():
     "return the value bound to var (in EXPR) in current env"
@@ -50,8 +53,10 @@ def lookup_expr():
 
     return UNBOUND
 
+
 def is_unbound(reg):
     return fetch(reg) == UNBOUND
+
 
 def define_var():
     "bind var (in UNEV) to val (in VAL) in the most recent frame"
@@ -60,6 +65,7 @@ def define_var():
     frame, enclosure = env
     frame[var] = val
     write_to_address([frame, enclosure], address)
+
 
 def set_var():
     "bind the most recent occurence of var (in UNEV) to val (in VAL)"
@@ -79,6 +85,7 @@ def set_var():
 
     # raise exception? return dummy val?
 
+
 def define_macro():
     _, macro_name, params, expr = fetch(EXPR)
 
@@ -95,9 +102,11 @@ def define_macro():
 
     write_to_address([global_frame, enclosure], ROOT)
 
+
 def is_macro(expr):
     global_frame, _ = read_from_address(ROOT)
     return expr in global_frame[MACRO]
+
 
 def extend_env():
     env_pointer = fetch(ENV)
@@ -113,13 +122,16 @@ def extend_env():
 
     write_env_to_new_memory(ext_env)
 
+
 # initialization
 
 def initial_env():
     return [LIBRARY, None]
 
+
 def initialize_env():
     write_to_address(initial_env(), ROOT)
+
 
 def load_global_env():
     assign(ENV, ROOT)

@@ -14,13 +14,16 @@ from mem import \
 
 MEM_LEN = 16
 
+
 def collect_garbage_if_needed():
     free_address = next_free_address(load_memory())
     if convert_str_address(free_address) >= MEM_LEN:
         print('Collecting gargage...')
         collect_garbage()
 
+
 BROKEN_HEART = '</3'
+
 
 # stop and copy
 def collect_garbage():

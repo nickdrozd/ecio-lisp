@@ -20,6 +20,7 @@ INTERPRETER_PROMPT = '<<< '
 INTERPRETER_EXIT = '.quit', '.exit'
 EXIT_MESSAGE = 'Byeeeeeeee!'
 
+
 def repl():
     info_flag = 0
     stats_flag = 1
@@ -36,6 +37,7 @@ def repl():
         # except Exception as e: # better way to do this?
         #   print(e)
 
+
 def ecio_eval(expr):
     '''Evaluates an expression without invoking the repl'''
 
@@ -43,6 +45,7 @@ def ecio_eval(expr):
     parse_and_set_expr(expr)
     run()
     return get_result()
+
 
 def initialize():
     # optional
@@ -52,6 +55,7 @@ def initialize():
     # required
     initialize_env()
 
+
 def get_expr():
     expr = input(INTERPRETER_PROMPT)
 
@@ -60,18 +64,22 @@ def get_expr():
     else:
         parse_and_set_expr(expr)
 
+
 def display_result(stats_flag=1):
     print(get_result())
     print()
     display_stats(stats_flag)
     print()
 
+
 def parse_and_set_expr(lisp_expr):
     parsed = parse(lisp_expr)
     assign(EXPR, parsed)
 
+
 def get_result():
     return fetch(VAL)
+
 
 if __name__ == '__main__':
     repl()

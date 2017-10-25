@@ -13,30 +13,31 @@ from reg import fetch, assign, FUNC, ARGL, VAL
 # primitive i/o
 
 ARITY_0 = {
-    'read' : lambda: parse(input()),
+    'read': lambda: parse(input()),
 }
 
 ARITY_1 = {
-    'show' : print,
+    'show': print,
 
-    'car' : lambda p: p[0],
-    'cdr' : lambda p: p[1:],  # cdr must be a list
+    'car': lambda p: p[0],
+    'cdr': lambda p: p[1:],  # cdr must be a list
 }
 
 ARITY_2 = {
-    'cons' : lambda a, d: [a] + d,
+    'cons': lambda a, d: [a] + d,
 
     # primitive arithmetic
 
-    '_+' : operator.add,
-    '_*' : operator.mul,
-    '_-' : operator.sub,
-    '_/' : operator.floordiv,
+    '_+': operator.add,
+    '_*': operator.mul,
+    '_-': operator.sub,
+    '_/': operator.floordiv,
 
-    '=' : operator.eq,
-    '<' : operator.lt,
-    '>' : operator.gt,
+    '=': operator.eq,
+    '<': operator.lt,
+    '>': operator.gt,
 }
+
 
 def is_primitive(var):
     try:
@@ -47,10 +48,13 @@ def is_primitive(var):
     except TypeError:
         return False
 
+
 def is_primitive_func():
     return is_primitive(fetch(FUNC))
 
+
 # prim funcs assumed to take two args
+
 def apply_primitive_func():
     func = fetch(FUNC)
 

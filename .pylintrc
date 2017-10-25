@@ -66,11 +66,8 @@ confidence=
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
 disable=missing-docstring,
-		locally-disabled,
-		file-ignored,
-		attribute-defined-outside-init,
-		duplicate-code,
-		cyclic-import
+        trailing-comma-tuple
+
 
 [REPORTS]
 

@@ -20,15 +20,19 @@ EMPTY_REG = '"***"'
 def fetch(reg):
     return fileio.read_file(reg, default=EMPTY_REG)
 
+
 def assign(reg, val):
     fileio.write_file(reg, val)
+
 
 def clear_register(reg):
     assign(reg, EMPTY_REG)
 
+
 def clear_registers():
     for reg in REGISTERS:
         clear_register(reg)
+
 
 # particular register operations
 

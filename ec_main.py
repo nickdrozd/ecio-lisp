@@ -105,7 +105,7 @@ def IF_DECIDE():
     restore(EXPR)
     restore(CONT)
     restore(ENV)
-    if fetch(VAL): # or if isTrue(fetch(VAL))
+    if fetch(VAL):  # or if isTrue(fetch(VAL))
         goto(IF_THEN)
     else:
         goto(IF_ELSE)
@@ -204,7 +204,7 @@ def COMPOUND_ARG():
     save(ARGL)
 
     # 'evlis' tail recursion
-    if not fetch(UNEV): # if no_remaining_args():
+    if not fetch(UNEV):  # if no_remaining_args():
         goto(LAST_ARG)
         return
 
