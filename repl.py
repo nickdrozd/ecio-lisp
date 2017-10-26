@@ -21,6 +21,10 @@ INTERPRETER_EXIT = '.quit', '.exit'
 EXIT_MESSAGE = 'Byeeeeeeee!'
 
 
+class ExitException(Exception):
+    pass
+
+
 def repl():
     info_flag = 0
     stats_flag = 1
@@ -31,11 +35,12 @@ def repl():
             get_expr()
             run(info_flag=info_flag)
             display_result(stats_flag=stats_flag)
+        except ExitException:
+            print(EXIT_MESSAGE)
+            exit(0)
         except KeyboardInterrupt:
             print()
-            break
-        # except Exception as e: # better way to do this?
-        #   print(e)
+            exit(1)
 
 
 def ecio_eval(expr):
@@ -60,7 +65,7 @@ def get_expr():
     expr = input(INTERPRETER_PROMPT)
 
     if expr in INTERPRETER_EXIT:
-        raise Exception(EXIT_MESSAGE)
+        raise ExitException()
     else:
         parse_and_set_expr(expr)
 
