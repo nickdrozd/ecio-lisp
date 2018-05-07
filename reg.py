@@ -2,6 +2,7 @@ import fileio
 
 from stats import fetch_stats
 
+from typing import Any
 EXPR = 'EXPR'
 VAL = 'VAL'
 ENV = 'ENV'
@@ -21,22 +22,22 @@ def fetch(reg):
     return fileio.read_file(reg, default=EMPTY_REG)
 
 
-def assign(reg, val):
+def assign(reg: str, val: Any) -> None:
     fileio.write_file(reg, val)
 
 
-def clear_register(reg):
+def clear_register(reg: str) -> None:
     assign(reg, EMPTY_REG)
 
 
-def clear_registers():
+def clear_registers() -> None:
     for reg in REGISTERS:
         clear_register(reg)
 
 
 # particular register operations
 
-def adjoin_arg():
+def adjoin_arg() -> None:
     curr_args = fetch(ARGL)
     new_arg = fetch(VAL)
     adjoined = curr_args + [new_arg]

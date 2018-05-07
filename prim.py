@@ -12,6 +12,7 @@ from reg import fetch, assign, FUNC, ARGL, VAL
 
 # primitive i/o
 
+from typing import Any
 ARITY_0 = {
     'read': lambda: parse(input()),
 }
@@ -39,7 +40,7 @@ ARITY_2 = {
 }
 
 
-def is_primitive(var):
+def is_primitive(var: Any) -> bool:
     try:
         return any(
             var in primitives for primitives in
@@ -49,13 +50,13 @@ def is_primitive(var):
         return False
 
 
-def is_primitive_func():
+def is_primitive_func() -> bool:
     return is_primitive(fetch(FUNC))
 
 
 # prim funcs assumed to take two args
 
-def apply_primitive_func():
+def apply_primitive_func() -> None:
     func = fetch(FUNC)
 
     if func in ARITY_0:

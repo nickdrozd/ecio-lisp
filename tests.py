@@ -342,3 +342,7 @@ class TestGarbageCollector(EcioTestCase):
 
     def load_memory(self):
         self.memory = load_memory()
+
+
+if __name__ == '__main__':
+    unittest.main()

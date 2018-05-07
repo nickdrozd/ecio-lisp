@@ -20,22 +20,23 @@ from prim import is_primitive
 from mem import ROOT, read_from_address, write_to_address, write_to_free_address
 
 
+from typing import Any, Dict, List, Optional, Union
 UNBOUND = 'UNBOUND'
 
 
-def read_env_from_memory():
+def read_env_from_memory() -> Any:
     "read env from memory"
     address = fetch(ENV)
     return read_from_address(address), address
 
 
-def write_env_to_new_memory(env):
+def write_env_to_new_memory(env: Union[List[Union[Dict[str, int], str]], List[Union[Dict[str, Union[int, List[int]]], str]], List[Union[Dict[str, Union[str, int, List[int]]], str]], List[Union[Dict[str, List[Any]], str]], List[Union[Dict[str, List[int]], str]]]) -> None:
     "write env to memory at the earliest available address"
     address = write_to_free_address(env)
     assign(ENV, address)
 
 
-def lookup_expr():
+def lookup_expr() -> Any:
     "return the value bound to var (in EXPR) in current env"
     var = fetch(EXPR)
 
@@ -54,11 +55,11 @@ def lookup_expr():
     return UNBOUND
 
 
-def is_unbound(reg):
+def is_unbound(reg: str) -> bool:
     return fetch(reg) == UNBOUND
 
 
-def define_var():
+def define_var() -> None:
     "bind var (in UNEV) to val (in VAL) in the most recent frame"
     var, val = fetch(UNEV), fetch(VAL)
     env, address = read_env_from_memory()
@@ -103,12 +104,12 @@ def define_macro():
     write_to_address([global_frame, enclosure], ROOT)
 
 
-def is_macro(expr):
+def is_macro(expr: Union[List[Union[str, List[Union[str, List[str]]], List[str]]], List[Union[List[Union[str, List[Union[str, List[str]]], List[str]]], str]], str]) -> bool:
     global_frame, _ = read_from_address(ROOT)
     return expr in global_frame[MACRO]
 
 
-def extend_env():
+def extend_env() -> None:
     env_pointer = fetch(ENV)
     params = fetch(UNEV)
     args = fetch(ARGL)
@@ -125,13 +126,13 @@ def extend_env():
 
 # initialization
 
-def initial_env():
+def initial_env() -> List[Union[Dict[str, Union[List[Union[str, List[List[Union[str, int]]]]], str, List[Union[str, List[str], List[List[Union[str, int]]]]], List[Union[str, List[str], List[Union[List[Union[str, List[Union[str, List[str], List[Union[str, List[str], List[Union[str, List[Union[str, List[str]]], List[str]]]]]]]]], List[str]]]]], List[Union[str, List[str]]], List[Union[str, List[str], List[List[Union[str, List[str]]]]]], List[Union[str, List[str], List[List[str]]]]]], NoneType]]:
     return [LIBRARY, None]
 
 
-def initialize_env():
+def initialize_env() -> None:
     write_to_address(initial_env(), ROOT)
 
 
-def load_global_env():
+def load_global_env() -> None:
     assign(ENV, ROOT)

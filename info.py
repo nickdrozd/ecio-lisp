@@ -8,7 +8,7 @@ from stack import STACK, read_stack
 from instr import INSTR
 
 
-def display_info(info_flag=0):
+def display_info(info_flag: int = 0) -> None:
     if info_flag:
         show_instr()
         show_registers()

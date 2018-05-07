@@ -2,16 +2,17 @@ import fileio
 from reg import fetch, assign
 from stats import save_stats, restore_stats
 
+from typing import Any
 STACK = 'STACK'
 
 EMPTY_STACK = []
 
 
-def read_stack():
+def read_stack() -> Any:
     return fileio.read_file(STACK, default=EMPTY_STACK)
 
 
-def write_stack(data):
+def write_stack(data: Any) -> None:
     fileio.write_file(STACK, data)
 
 
@@ -30,5 +31,5 @@ def restore(reg):
     write_stack(rest)
 
 
-def clear_stack():
+def clear_stack() -> None:
     write_stack(EMPTY_STACK)
